@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "0275fc216fde6e3f3880a01f3a717a2ab3a602c2",
+  "sha256": {
+    "public/app.js": "a2b6546064a1e0d6e8b59f57e9533a5d0e7270d6404a0d39d87a7fb87be6e500",
+    "public/arena-background.png": "72dbb06b68daba8e21b30f8828967bc66f943968330791d597f9029aa6af9123",
+    "public/club-logo.png": "1df19757b93152d421c46a37591fbeb970e1387cb88258b22bc5e9f5d2e61b7c",
+    "public/data.js": "f36909187f2ee344244aca3baed855ae485d38410f6dfea4f1b0eb9a182210d4",
+    "public/hero-emblem.png": "7344d2401304f6e1dedbbc3319f534d83b9bc513bf2af6c65cca0bda597438b2",
+    "public/index.html": "ccf38d8befe9b3ab4f6a29ca3bf3b9e1cbaa7d7102c5a65d8f75dfa6eb14c3c8",
+    "public/logo-metallic.png": "1df19757b93152d421c46a37591fbeb970e1387cb88258b22bc5e9f5d2e61b7c",
+    "public/logo.png": "1ef2b5512976aa78b4a7149fa5020c7bb7b6c378880462065a0e709ef5b3ad48",
+    "public/motion.js": "b3c0448c451b18d018d3606deb8e09d28d7816af1f113b599c034489ddc7ad9b",
+    "public/player-emblem.png": "80324c7366ba636fc028d49b1d0e94ab78656c858c97dca236c1b4dc04e2e3f3",
+    "public/styles.css": "88c56fa113c63c35fe0d428a5123ba24569a2a8ffa9422903b7bb80e7310fc87"
+  }
+}
