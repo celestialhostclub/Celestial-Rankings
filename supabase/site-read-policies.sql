@@ -1,6 +1,7 @@
--- Public read-only access for the Celestial Rankings website.
--- Run once in Supabase SQL Editor after the bot tables are created.
--- WhatsApp group/player IDs and recorder IDs are intentionally not exposed.
+-- Safe read-only views for the public Celestial Rankings site.
+-- Run this script once in Supabase SQL Editor.
+-- The views expose only public match/player fields and only generated/finished trainings.
+-- Do not grant anon access to the underlying tables: they contain WhatsApp JIDs.
 
 revoke all on table
   public.training_sessions,
@@ -11,67 +12,71 @@ revoke all on table
 from anon, authenticated;
 
 drop policy if exists site_read_published_sessions on public.training_sessions;
-create policy site_read_published_sessions
-on public.training_sessions for select to anon
-using (status in ('generated', 'finished'));
-
 drop policy if exists site_read_published_teams on public.training_teams;
-create policy site_read_published_teams
-on public.training_teams for select to anon
-using (
-  exists (
-    select 1 from public.training_sessions s
-    where s.id = session_id and s.status in ('generated', 'finished')
-  )
-);
-
 drop policy if exists site_read_published_team_players on public.training_team_players;
-create policy site_read_published_team_players
-on public.training_team_players for select to anon
-using (
-  exists (
-    select 1
-    from public.training_teams t
-    join public.training_sessions s on s.id = t.session_id
-    where t.id = team_id and s.status in ('generated', 'finished')
-  )
-);
-
 drop policy if exists site_read_published_matches on public.training_matches;
-create policy site_read_published_matches
-on public.training_matches for select to anon
-using (
-  exists (
-    select 1 from public.training_sessions s
-    where s.id = session_id and s.status in ('generated', 'finished')
-  )
-);
-
 drop policy if exists site_read_published_maps on public.training_maps;
-create policy site_read_published_maps
-on public.training_maps for select to anon
-using (
-  exists (
-    select 1
-    from public.training_matches m
-    join public.training_sessions s on s.id = m.session_id
-    where m.id = match_id and s.status in ('generated', 'finished')
-  )
-);
+
+create or replace view public.site_training_sessions
+with (security_barrier = true)
+as
+select id, status, opened_at, generated_at, finished_at, created_at
+from public.training_sessions
+where status in ('generated', 'finished');
+
+create or replace view public.site_training_teams
+with (security_barrier = true)
+as
+select
+  t.id, t.session_id, t.team_number, t.average_trophies,
+  t.match_wins, t.match_losses, t.maps_won, t.maps_lost
+from public.training_teams t
+join public.training_sessions s on s.id = t.session_id
+where s.status in ('generated', 'finished');
+
+create or replace view public.site_training_team_players
+with (security_barrier = true)
+as
+select
+  p.id, p.team_id, p.player_tag, p.player_name, p.trophies_at_training
+from public.training_team_players p
+join public.training_teams t on t.id = p.team_id
+join public.training_sessions s on s.id = t.session_id
+where s.status in ('generated', 'finished');
+
+create or replace view public.site_training_matches
+with (security_barrier = true)
+as
+select
+  m.id, m.session_id, m.match_number, m.team_a_id, m.team_b_id,
+  m.status, m.maps_a, m.maps_b, m.winner_team_id,
+  m.winner_decided_at, m.finished_at, m.created_at
+from public.training_matches m
+join public.training_sessions s on s.id = m.session_id
+where s.status in ('generated', 'finished');
+
+create or replace view public.site_training_maps
+with (security_barrier = true)
+as
+select
+  mp.id, mp.match_id, mp.map_number, mp.rounds_a, mp.rounds_b,
+  mp.winner_side, mp.recorded_at
+from public.training_maps mp
+join public.training_matches m on m.id = mp.match_id
+join public.training_sessions s on s.id = m.session_id
+where s.status in ('generated', 'finished');
 
 grant usage on schema public to anon;
+revoke all on public.site_training_sessions,
+  public.site_training_teams,
+  public.site_training_team_players,
+  public.site_training_matches,
+  public.site_training_maps
+from anon, authenticated;
 
-grant select (id, status, opened_at, generated_at, finished_at, created_at)
-  on public.training_sessions to anon;
-
-grant select (id, session_id, team_number, average_trophies, match_wins, match_losses, maps_won, maps_lost)
-  on public.training_teams to anon;
-
-grant select (id, team_id, player_tag, player_name, trophies_at_training)
-  on public.training_team_players to anon;
-
-grant select (id, session_id, match_number, team_a_id, team_b_id, status, maps_a, maps_b, winner_team_id, winner_decided_at, finished_at, created_at)
-  on public.training_matches to anon;
-
-grant select (id, match_id, map_number, rounds_a, rounds_b, winner_side, recorded_at)
-  on public.training_maps to anon;
+grant select on public.site_training_sessions,
+  public.site_training_teams,
+  public.site_training_team_players,
+  public.site_training_matches,
+  public.site_training_maps
+to anon;
