@@ -16,7 +16,6 @@ async function readRows(baseUrl, key, table, params) {
   const response = await fetch(url, {
     headers: {
       apikey: key,
-      authorization: `Bearer ${key}`,
       accept: "application/json",
     },
   });
