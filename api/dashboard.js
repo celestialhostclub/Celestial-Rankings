@@ -19,7 +19,10 @@ async function readRows(baseUrl, key, table, params) {
       accept: "application/json",
     },
   });
-  if (!response.ok) throw new Error(`SUPABASE_READ_${table}_${response.status}`);
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 180).replace(/[\\r\\n]+/g, " ");
+    throw new Error(`SUPABASE_READ_${table}_${response.status}: ${detail}`);
+  }
   return response.json();
 }
 
