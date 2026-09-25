@@ -97,7 +97,7 @@ async function renderPlayerSearch(){
  if(!/^[A-Z0-9]+$/.test(tag)){result.innerHTML='<p class="search-message">Confira a tag: use apenas letras e números, com ou sem #.</p>';return;}
  result.innerHTML='<p class="search-message">Carregando estatísticas do período…</p>';
  try{
-  const p=await getPlayerStats('#'+tag);
+  const p=await getPlayerStats('#'+tag,{period,month:$('#month').value});
   if(requestId!==playerSearchRequest)return;
   if(!p){result.innerHTML='<p class="search-message">Nenhum resultado para essa tag neste período. Confira a tag ou escolha outro período.</p>';return;}
   const index=allPlayers.findIndex(player=>normalizeTag(player.tag)===tag);

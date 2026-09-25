@@ -34,8 +34,8 @@ export async function getDashboard({ period = "month", month = "" } = {}) {
   return data;
 }
 
-export async function getPlayerStats(tag) {
-  const query = new URLSearchParams({ tag });
+export async function getPlayerStats(tag, { period = "month", month = "" } = {}) {
+  const query = new URLSearchParams({ tag, period, month });
   const response = await fetch(`/api/player?${query}`, {
     headers: { accept: "application/json" },
     cache: "no-store",

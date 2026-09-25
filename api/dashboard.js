@@ -56,13 +56,17 @@ function chunks(values, size) {
   return result;
 }
 
-function sortPlayers(rows) {
-  return rows.map(mapRankingRow).sort((a, b) =>
-    b.wins - a.wins ||
-    b.mapsWon - a.mapsWon ||
-    a.mapsLost - b.mapsLost ||
-    a.name.localeCompare(b.name, "pt-BR")
+function sortPlayers(rows, period) {
+  const ordered = [...rows].sort((a, b) =>
+    Number(b.match_wins || 0) - Number(a.match_wins || 0) ||
+    (period === "month"
+      ? Number(b.match_win_rate || 0) - Number(a.match_win_rate || 0)
+      : 0) ||
+    Number(b.maps_won || 0) - Number(a.maps_won || 0) ||
+    Number(a.maps_lost || 0) - Number(b.maps_lost || 0) ||
+    String(a.player_name || "").localeCompare(String(b.player_name || ""), "pt-BR")
   );
+  return ordered.map(mapRankingRow);
 }
 
 export default async function handler(req, res) {
@@ -80,16 +84,28 @@ export default async function handler(req, res) {
 
   try {
     const period = req.query?.period === "all" ? "all" : "month";
-    const month = /^\d{4}-\d{2}$/.test(String(req.query?.month || ""))
-      ? String(req.query.month)
-      : "";
+    const requestedMonth = String(req.query?.month || "");
+    const monthMatch = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(requestedMonth);
+    const month = monthMatch ? requestedMonth : "";
+    const monthStart = month ? month + "-01" : "";
+
+    const rankingRequest = period === "all"
+      ? readRows(baseUrl, key, "active_training_player_ranking", {
+          select: rankingFields,
+          order: "match_wins.desc,maps_won.desc,maps_lost.asc,player_name.asc",
+          limit: "5000",
+        })
+      : monthStart
+        ? readRows(baseUrl, key, "active_training_player_monthly_ranking", {
+            select: "month_start," + rankingFields,
+            month_start: "eq." + monthStart,
+            order: "match_wins.desc,match_win_rate.desc,maps_won.desc,maps_lost.asc,player_name.asc",
+            limit: "5000",
+          })
+        : Promise.resolve([]);
 
     const [rankingRows, rawSessions] = await Promise.all([
-      readRows(baseUrl, key, "active_training_player_ranking", {
-        select: rankingFields,
-        order: "match_wins.desc,maps_won.desc,maps_lost.asc,player_name.asc",
-        limit: "5000",
-      }),
+      rankingRequest,
       readRows(baseUrl, key, "training_sessions", {
         select: "id,status,opened_at,generated_at,finished_at,created_at",
         status: "eq.finished",
@@ -234,7 +250,7 @@ export default async function handler(req, res) {
 
     res.setHeader("Cache-Control", "public, s-maxage=15, stale-while-revalidate=30");
     return res.status(200).json({
-      players: sortPlayers(rankingRows),
+      players: sortPlayers(rankingRows, period),
       summary: {
         trainings: filteredSessions.length,
         maps: mapsPlayed,

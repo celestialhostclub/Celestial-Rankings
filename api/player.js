@@ -6,9 +6,13 @@ function normalizeTag(value) {
   return cleaned.startsWith("#") ? cleaned : "#" + cleaned;
 }
 
-async function readPlayer(baseUrl, key, tag) {
-  const url = new URL("/rest/v1/active_training_player_ranking", baseUrl);
+async function readPlayer(baseUrl, key, tag, period, monthStart) {
+  const table = period === "all"
+    ? "active_training_player_ranking"
+    : "active_training_player_monthly_ranking";
+  const url = new URL("/rest/v1/" + table, baseUrl);
   url.searchParams.set("select", rankingFields);
+  if (period !== "all") url.searchParams.set("month_start", "eq." + monthStart);
   url.searchParams.set("player_tag", "eq." + tag);
   url.searchParams.set("limit", "1");
   const headers = { apikey: key, accept: "application/json" };
@@ -16,7 +20,7 @@ async function readPlayer(baseUrl, key, tag) {
   const response = await fetch(url, { headers });
   if (!response.ok) {
     const detail = (await response.text()).slice(0, 180).replace(/[\r\n]+/g, " ");
-    throw new Error("SUPABASE_READ_active_training_player_ranking_" + response.status + ": " + detail);
+    throw new Error("SUPABASE_READ_" + table + "_" + response.status + ": " + detail);
   }
   return response.json();
 }
@@ -38,8 +42,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "A tag válida deve conter apenas letras e números." });
   }
 
+  const period = req.query?.period === "all" ? "all" : "month";
+  const requestedMonth = String(req.query?.month || "");
+  const monthMatch = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(requestedMonth);
+  const monthStart = monthMatch ? requestedMonth + "-01" : "";
+  if (period === "month" && !monthStart) {
+    res.setHeader("Cache-Control", "private, no-store");
+    return res.status(200).json({ player: null });
+  }
+
   try {
-    const rows = await readPlayer(baseUrl, key, tag);
+    const rows = await readPlayer(baseUrl, key, tag, period, monthStart);
     const row = rows[0];
     const rawRate = Number(row?.match_win_rate || 0);
     const player = row ? {
