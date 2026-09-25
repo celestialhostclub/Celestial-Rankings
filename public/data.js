@@ -34,6 +34,20 @@ export async function getDashboard({ period = "month", month = "" } = {}) {
   return data;
 }
 
+export async function getPlayerStats(tag) {
+  const query = new URLSearchParams({ tag });
+  const response = await fetch(`/api/player?${query}`, {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Não foi possível consultar essa tag.");
+  const data = await response.json();
+  if (!Object.prototype.hasOwnProperty.call(data, "player")) {
+    throw new Error("A resposta da busca está incompleta.");
+  }
+  return data.player;
+}
+
 export function getTeamPlayers(sessionId, teamId) {
   const team = sessions
     .find((session) => String(session.id) === String(sessionId))

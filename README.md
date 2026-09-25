@@ -60,7 +60,11 @@ A navegação usa fragmentos (`#treinos`, `#rankings`, `#sobre-nos`); não preci
 
 ## Dados e integrações
 
-Os resultados continuam demonstrativos. Não há Supabase conectado, banco de dados, API própria ou código do Zeus BOT neste projeto. O ponto verde do Zeus BOT é um indicador visual, não monitora a conexão real. A tela de contato e as categorias futuras mantêm o comportamento atual.
+O navegador acessa os dados somente pelas APIs da Vercel: `/api/dashboard` e `/api/player`. Configure `SUPABASE_URL` e `SUPABASE_SECRET_KEY` como variáveis de ambiente do projeto Vercel; a chave secreta é lida apenas no backend e nunca deve ser colocada em arquivos públicos, variáveis `NEXT_PUBLIC_*` ou no GitHub. Para projetos que ainda usem a chave legada, a API também aceita `SUPABASE_SERVICE_ROLE_KEY`, igualmente somente no backend.
+
+O ranking e a busca individual usam exclusivamente a view `active_training_player_ranking`. A busca normaliza a tag e consulta `player_tag` diretamente nessa view. O histórico oficial lista somente sessões `finished` em `training_sessions`; detalhes usam `training_teams`, `training_team_players`, `training_matches` e `training_maps`, selecionando apenas campos públicos. Nenhum JID, LID, telefone, `player_jid` ou `recorded_by` é consultado ou enviado ao navegador.
+
+A view oficial não contém campo de mês. Assim, ela fornece os totais oficiais para a busca e o ranking; os filtros de período continuam afetando o resumo e o histórico, mas não podem gerar um ranking mensal exato sem uma fonte que tenha a dimensão de mês. O ponto verde do Zeus BOT é um indicador visual, não monitora a conexão real. A tela de contato e as categorias futuras mantêm o comportamento atual.
 
 Para uma integração futura, o ponto de partida é `public/data.js`. As funções `getDashboard`, `teamStats` e `getTeamPlayers` e a lista `sessions` atendem à interface atual. Chaves privadas de Supabase ou do bot devem permanecer em um backend, nunca em arquivos de `public/`.
 

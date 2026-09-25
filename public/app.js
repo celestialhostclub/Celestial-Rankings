@@ -1,7 +1,7 @@
 import {enter,initMotion} from './motion.js';
 const icons={"chart": "<path d=\"M4 21V12h4v9M10 21V3h4v18M16 21V8h4v13\"/>", "trophy": "<path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 0v6m-5 3h10m-8 0v-3h6v3\"/>", "users": "<circle cx=\"9\" cy=\"7\" r=\"3\"/><path d=\"M3 21v-3a6 6 0 0 1 12 0v3M16 4a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 5v2\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 6v6l4 2\"/>", "map": "<path d=\"m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16\"/>", "swords": "<path d=\"m3 3 5 1 12 14-2 2L4 8 3 3Zm18 0-5 1-5 6m-3 3-4 5 2 2 4-4M3 21l3-3m12 0 3 3M2 16l6 6m8 0 6-6\"/>", "lock": "<rect x=\"5\" y=\"10\" width=\"14\" height=\"11\" rx=\"2\"/><path d=\"M8 10V7a4 4 0 0 1 8 0v3m-4 5v2\"/>"};
 const iconSvg=(name)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.chart}</svg>`;
-import{getDashboard,teamStats,sessions,getTeamPlayers}from'./data.js';
+import{getDashboard,getPlayerStats,teamStats,sessions,getTeamPlayers}from'./data.js';
 const $=s=>document.querySelector(s);let period='month',request=0,allPlayers=[],searchActive=false,rankingState='loading';const date=d=>new Date(d+'T12:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}).replace('.','');const year=d=>String(d).slice(0,4);const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const initials=p=>escape(p.name.slice(0,2).toUpperCase());const rate=p=>`<span class="rate"><span class="bar"><i style="width:${p.rate}%"></i></span><strong>${p.rate}%</strong></span>`;
 const playerPortrait=()=>`<span class="club-avatar" aria-hidden="true"><img src="player-emblem.png" alt="" width="64" height="64" decoding="async"></span>`;
 function renderRanking(players){players=players.slice(0,10);if(!players.length){$('#ranking-content').innerHTML='<div class="state">Ainda não há treinos registrados neste período.<br>O ranking será preenchido quando o bot salvar os primeiros resultados.</div>';return;}$('#ranking-content').innerHTML=`<div class="ranking-wrap"><table><caption class="sr">Ranking de jogadores por confrontos vencidos</caption><thead><tr><th scope="col">Pos.</th><th scope="col">Jogador</th><th scope="col">Tag</th><th scope="col">Treinos<br>jogados</th><th scope="col">Confrontos<br>vencidos</th><th scope="col">Confrontos<br>perdidos</th><th scope="col">Mapas<br>vencidos</th><th scope="col">Mapas<br>perdidos</th><th scope="col">Taxa de<br>vitória</th></tr></thead><tbody>${players.map((p,i)=>`<tr class="rank-${i+1}"><td><span class="rank-number">${String(i+1).padStart(2,'0')}</span></td><td><span class="player">${playerPortrait()}${escape(p.name)}</span></td><td class="tag">${escape(p.tag)}</td><td>${p.trainings}</td><td class="win">${p.wins}</td><td class="loss">${p.losses}</td><td>${p.mapsWon}</td><td class="loss">${p.mapsLost}</td><td>${rate(p)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-ranking">${players.map((p,i)=>`<article class="player-card rank-${i+1}"><div class="player-top"><span class="rank-number">${i+1}</span>${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div>${rate(p)}</div><div class="player-card-stats"><div><small>Treinos jogados</small><strong>${p.trainings}</strong></div><div><small>Confrontos</small><strong>${p.wins} V <span class="loss">/ ${p.losses} D</span></strong></div><div><small>Mapas</small><strong>${p.mapsWon} V <span class="loss">/ ${p.mapsLost} D</span></strong></div></div></article>`).join('')}</div>`;}
@@ -89,20 +89,28 @@ document.addEventListener('click',event=>{
 $('#close-team-dialog').onclick=()=>rosterDialog.close();
 rosterDialog.addEventListener('click',event=>{if(event.target!==rosterDialog)return;const r=rosterDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)rosterDialog.close();});
 
-function normalizeTag(value){return value.trim().toUpperCase().replace(/^#/,'');}
-function renderPlayerSearch(){
- const result=$('#player-search-result');const tag=normalizeTag($('#player-tag').value);
+function normalizeTag(value){return String(value||'').replace(/\s+/g,'').toUpperCase().replace(/^#/,'');}
+let playerSearchRequest=0;
+async function renderPlayerSearch(){
+ const result=$('#player-search-result'),tag=normalizeTag($('#player-tag').value),requestId=++playerSearchRequest;
  if(!tag){result.innerHTML='<p class="search-message">Digite sua tag para consultar.</p>';return;}
  if(!/^[A-Z0-9]+$/.test(tag)){result.innerHTML='<p class="search-message">Confira a tag: use apenas letras e números, com ou sem #.</p>';return;}
- if(rankingState==='loading'){result.innerHTML='<p class="search-message">Carregando estatísticas do período…</p>';return;}
- if(rankingState==='error'){result.innerHTML='<p class="search-message">Não foi possível consultar. Tente carregar o ranking novamente.</p>';return;}
- const index=allPlayers.findIndex(p=>normalizeTag(p.tag)===tag);const p=allPlayers[index];
- if(!p){result.innerHTML='<p class="search-message">Nenhum resultado para essa tag neste período. Confira a tag ou escolha outro período.</p>';return;}
- const label=period==='all'?'Todos os tempos':$('#month').selectedOptions[0].textContent;
- result.innerHTML=`<article class="lookup-result"><div class="lookup-player">${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div><span class="lookup-position">${index+1}º lugar</span></div><p class="lookup-period">${escape(label)}</p><dl class="lookup-stats">${[['Treinos jogados',p.trainings],['Confrontos vencidos',p.wins],['Confrontos perdidos',p.losses],['Mapas vencidos',p.mapsWon],['Mapas perdidos',p.mapsLost],['Taxa de vitória',p.rate+'%']].map(([name,value])=>`<div><dt>${name}</dt><dd>${value}</dd></div>`).join('')}</dl></article>`;
+ result.innerHTML='<p class="search-message">Carregando estatísticas do período…</p>';
+ try{
+  const p=await getPlayerStats('#'+tag);
+  if(requestId!==playerSearchRequest)return;
+  if(!p){result.innerHTML='<p class="search-message">Nenhum resultado para essa tag neste período. Confira a tag ou escolha outro período.</p>';return;}
+  const index=allPlayers.findIndex(player=>normalizeTag(player.tag)===tag);
+  const position=index>=0?(index+1)+'º lugar':'';
+  const label=period==='all'?'Todos os tempos':$('#month').selectedOptions[0].textContent;
+  result.innerHTML=`<article class="lookup-result"><div class="lookup-player">${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div><span class="lookup-position">${position}</span></div><p class="lookup-period">${escape(label)}</p><dl class="lookup-stats">${[['Treinos jogados',p.trainings],['Confrontos vencidos',p.wins],['Confrontos perdidos',p.losses],['Mapas vencidos',p.mapsWon],['Mapas perdidos',p.mapsLost],['Taxa de vitória',p.rate+'%']].map(([name,value])=>`<div><dt>${name}</dt><dd>${value}</dd></div>`).join('')}</dl></article>`;
+ }catch{
+  if(requestId!==playerSearchRequest)return;
+  result.innerHTML='<p class="search-message">Não foi possível consultar. Tente carregar o ranking novamente.</p>';
+ }
 }
 $('#player-search').onsubmit=event=>{event.preventDefault();searchActive=true;renderPlayerSearch();};
-$('#player-tag').oninput=()=>{searchActive=false;$('#player-search-result').innerHTML='';};
+$('#player-tag').oninput=()=>{searchActive=false;playerSearchRequest++;$('#player-search-result').innerHTML='';};
 
 const compactSearch=matchMedia('(min-width:1100px)');
 function positionSearch(){

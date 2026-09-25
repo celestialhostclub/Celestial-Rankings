@@ -2,7 +2,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 const root=new URL('../',import.meta.url);
-for(const name of ['app.js','data.js','motion.js','../api/dashboard.js'])execFileSync(process.execPath,['--check',new URL('public/'+name,root).pathname]);
+for(const name of ['app.js','data.js','motion.js','../api/dashboard.js','../api/player.js'])execFileSync(process.execPath,['--check',new URL('public/'+name,root).pathname]);
 for(const name of ['index.html','styles.css','club-logo.png','arena-background.png','player-emblem.png'])readFileSync(new URL('public/'+name,root));
 console.log('Site estático validado. Arquivos prontos em public/.');
 if(process.argv.includes('--original')){
