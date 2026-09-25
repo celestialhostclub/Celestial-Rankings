@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     const month = /^\d{4}-\d{2}$/.test(String(req.query?.month || ""))
       ? String(req.query.month)
       : "";
-    const rawSessions = await readRows(baseUrl, key, "training_sessions", {
+    const rawSessions = await readRows(baseUrl, key, "site_training_sessions", {
       select: "id,status,opened_at,generated_at,finished_at,created_at",
       status: publishedStatuses,
       order: "opened_at.desc",
@@ -66,13 +66,13 @@ export default async function handler(req, res) {
 
     if (sessionIds.length) {
       [teams, matches] = await Promise.all([
-        readRows(baseUrl, key, "training_teams", {
+        readRows(baseUrl, key, "site_training_teams", {
           select: "id,session_id,team_number,average_trophies,match_wins,match_losses,maps_won,maps_lost",
           session_id: inFilter(sessionIds),
           order: "session_id,team_number",
           limit: "1000",
         }),
-        readRows(baseUrl, key, "training_matches", {
+        readRows(baseUrl, key, "site_training_matches", {
           select: "id,session_id,match_number,team_a_id,team_b_id,status,maps_a,maps_b,winner_team_id,winner_decided_at,finished_at",
           session_id: inFilter(sessionIds),
           order: "session_id,match_number",
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
         batches.push(teamIds.slice(index, index + 80));
       }
       roster = (await Promise.all(batches.map((ids) =>
-        readRows(baseUrl, key, "training_team_players", {
+        readRows(baseUrl, key, "site_training_team_players", {
           select: "id,team_id,player_tag,player_name,trophies_at_training",
           team_id: inFilter(ids),
           limit: "1000",
