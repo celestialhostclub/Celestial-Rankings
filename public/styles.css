@@ -106,7 +106,7 @@ body:has(#team-dialog[open]){overflow:hidden}
 body{background:#0d0f12}
 main{position:relative;isolation:isolate}
 .arena-background{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100vw;height:clamp(320px,31vw,500px);z-index:-1;pointer-events:none;overflow:hidden}
-.arena-background img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 47%}
+.arena-background img,.arena-background video{display:block;width:100%;height:100%;object-fit:cover;object-position:center 47%}
 .arena-background:after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 86%,#0d0f12 100%)}
 .hero{min-height:clamp(320px,31vw,500px);overflow:visible;isolation:auto;background:none;border:0}
 .hero:before,.hero:after{display:none}
@@ -115,7 +115,7 @@ main{position:relative;isolation:isolate}
 .hero p{max-width:650px}
 @media(max-width:760px){
  .arena-background{height:300px}
- .arena-background img{object-position:72% 47%}
+ .arena-background img,.arena-background video{object-position:72% 47%}
  .arena-background:after{background:linear-gradient(to bottom,transparent 86%,#0d0f12 100%),linear-gradient(to right,#0d0f1280,transparent 85%)}
  .hero{min-height:300px}
  .hero-copy{flex-basis:76%;width:auto;padding:26px 4px}
@@ -238,7 +238,7 @@ main[data-view]:not([data-view="treinos"]) .arena-background{display:none}
 /* Align ranking filters with the search input and button on desktop. */
 
 /* Mobile-only: nudge the banner artwork right to clear the hero text. */
-@media(max-width:760px){.arena-background img{object-position:66% 47%}}
+@media(max-width:760px){.arena-background img,.arena-background video{object-position:66% 47%}}
 
 /* Center desktop navigation independently of the brand and contact button. */
 @media(min-width:1000px){.header-inner{position:relative}.header-inner nav{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}}
