@@ -239,3 +239,6 @@ main[data-view]:not([data-view="treinos"]) .arena-background{display:none}
 
 /* Mobile-only: nudge the banner artwork right to clear the hero text. */
 @media(max-width:760px){.arena-background img{object-position:66% 47%}}
+
+/* Center desktop navigation independently of the brand and contact button. */
+@media(min-width:1000px){.header-inner{position:relative}.header-inner nav{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}}
