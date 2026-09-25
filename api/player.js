@@ -1,7 +1,7 @@
 const rankingFields = "player_tag,player_name,trainings_played,match_wins,match_losses,maps_won,maps_lost,match_win_rate";
 
 function formatPlayerName(value) {
-  return String(value || "Jogador").replace(/\\s*\\|\\s*/g, " | ");
+  return String(value || "Jogador").replace(/\s*\|\s*/g, " | ");
 }
 
 function normalizeTag(value) {
