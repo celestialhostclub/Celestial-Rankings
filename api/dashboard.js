@@ -1,5 +1,20 @@
 const rankingFields = "player_tag,player_name,trainings_played,match_wins,match_losses,maps_won,maps_lost,match_win_rate";
 
+function formatPlayerName(value) {
+  return String(value || "Jogador").replace(/\\s*\\|\\s*/g, " | ");
+}
+
+function teamLabel(teamNumber) {
+  let value = Number(teamNumber);
+  let label = "";
+  while (Number.isInteger(value) && value > 0) {
+    value--;
+    label = String.fromCharCode(65 + (value % 26)) + label;
+    value = Math.floor(value / 26);
+  }
+  return "Time " + (label || String(teamNumber));
+}
+
 const readableDate = (value) => {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Sao_Paulo",
@@ -20,7 +35,7 @@ function normalizeTag(value) {
 function mapRankingRow(row) {
   const rawRate = Number(row.match_win_rate || 0);
   return {
-    name: String(row.player_name || "Jogador"),
+    name: formatPlayerName(row.player_name),
     tag: normalizeTag(row.player_tag),
     trainings: Number(row.trainings_played || 0),
     wins: Number(row.match_wins || 0),
@@ -163,7 +178,7 @@ export default async function handler(req, res) {
     for (const player of roster) {
       const list = playersByTeam.get(player.team_id) || [];
       list.push({
-        name: String(player.player_name || "Jogador"),
+        name: formatPlayerName(player.player_name),
         tag: normalizeTag(player.player_tag),
         trophies: Number(player.trophies_at_training || 0),
       });
@@ -206,7 +221,7 @@ export default async function handler(req, res) {
       const list = teamsBySession.get(team.session_id) || [];
       list.push({
         id: team.id,
-        name: "Time " + team.team_number,
+        name: teamLabel(team.team_number),
         number: Number(team.team_number),
         players: playersByTeam.get(team.id) || [],
         played: Number(team.match_wins || 0) + Number(team.match_losses || 0),
