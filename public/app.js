@@ -42,14 +42,14 @@ function monthLabel(value){
 }
 function updateMonthOptions(months){
  const select=$('#month'),selected=select.value;
- select.innerHTML=months.length?months.map(value=>`<option value="${value}">`${monthLabel(value)}`</option>`).join():'<option value="">Nenhum treino registrado</option>';
+ select.innerHTML=months.length?months.map(value=>`<option value="${value}">${monthLabel(value)}</option>`).join():'<option value="">Nenhum treino registrado</option>';
  if(months.includes(selected))select.value=selected;
  else if(months.length)select.value=months[0];
  select.disabled=period==='all'||!months.length;
 }
 function updateTrainingPicker(){
  const select=$('#training'),selected=select.value;
- select.innerHTML=sessions.length?sessions.map(session=>`<option value="${escape(session.id)}">`${escape(session.name)} · ${date(session.date)} ${year(session.date)}`</option>`).join():'<option value="">Nenhum treino registrado</option>';
+ select.innerHTML=sessions.length?sessions.map(session=>`<option value="${escape(session.id)}">${escape(session.name)} · ${date(session.date)} ${year(session.date)}</option>`).join():'<option value="">Nenhum treino registrado</option>';
  select.disabled=!sessions.length;
  if(sessions.some(session=>String(session.id)===selected))select.value=selected;
 }
