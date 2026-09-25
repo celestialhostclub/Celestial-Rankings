@@ -1,5 +1,9 @@
 const rankingFields = "player_tag,player_name,trainings_played,match_wins,match_losses,maps_won,maps_lost,match_win_rate";
 
+function formatPlayerName(value) {
+  return String(value || "Jogador").replace(/\\s*\\|\\s*/g, " | ");
+}
+
 function normalizeTag(value) {
   const cleaned = String(value || "").replace(/\s+/g, "").toUpperCase();
   if (!cleaned) return "";
@@ -56,7 +60,7 @@ export default async function handler(req, res) {
     const row = rows[0];
     const rawRate = Number(row?.match_win_rate || 0);
     const player = row ? {
-      name: String(row.player_name || "Jogador"),
+      name: formatPlayerName(row.player_name),
       tag: normalizeTag(row.player_tag),
       trainings: Number(row.trainings_played || 0),
       wins: Number(row.match_wins || 0),
