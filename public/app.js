@@ -23,11 +23,12 @@ async function load(){
   renderRanking(allPlayers);if(searchActive)renderPlayerSearch();
   $('#ranking-content').setAttribute('aria-busy','false');
   enter(document.querySelectorAll('.ranking-wrap tbody tr,.player-card'),{distance:5,stagger:18,duration:260});
-  $('#data-status').hidden=Number(data.summary.trainings||0)>0;
+  $('#data-status').hidden=true;
   $('#summary').innerHTML=[['Treinos realizados',data.summary.trainings,'no período selecionado','swords'],['Mapas disputados',data.summary.maps,'cada mapa, uma oportunidade','map'],['Jogadores ranqueados',data.summary.players,'na disputa pelo topo','users'],['Última atualização',data.summary.updated,'','clock']].map(([label,value,sub,icon])=>`<article><span class="stat-icon" aria-hidden="true">${iconSvg(icon)}</span><span class="stat-label">${label}</span><strong>${value}</strong>${sub?'<small>'+sub+'</small>':''}</article>`).join('');
   enter(document.querySelectorAll('.summary article'),{distance:6,stagger:30,duration:300});
  }catch(e){
   if(id!==request)return;
+  $('#data-status').hidden=true;
   $('#ranking-content').setAttribute('aria-busy','false');
   $('#ranking-content').innerHTML='<div class="state" role="alert">Não foi possível carregar os resultados.<button id="retry">Tentar novamente</button></div>';
   $('#retry').onclick=load;rankingState='error';$('#search-submit').disabled=false;
