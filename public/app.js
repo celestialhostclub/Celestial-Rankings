@@ -9,7 +9,7 @@ async function load(){
  const id=++request;
  const requestedMonth=$('#month').value;
  $('#ranking-content').setAttribute('aria-busy','true');
- $('#ranking-content').innerHTML='<div class="skeleton" role="status" aria-label="Carregando ranking"></div>';
+ $('#ranking-content').innerHTML='<div class="ranking-loading" role="status"><span class="ranking-spinner" aria-hidden="true"></span><span>CARREGANDO TREINOS...</span></div>';
  allPlayers=[];rankingState='loading';$('#search-submit').disabled=true;
  if(searchActive)renderPlayerSearch();
  try{
