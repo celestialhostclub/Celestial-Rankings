@@ -74,7 +74,7 @@ function refreshRankingMonthMenu(){
    '" data-value="'+escape(option.value)+'" aria-selected="'+chosen+'" tabindex="-1">'+
    '<span class="training-menu-option-icon" aria-hidden="true">'+iconSvg('clock')+'</span>'+
    '<span class="training-menu-option-title">'+escape(option.textContent)+'</span>'+
-   (index===0?'<span class="training-menu-newest">MAIS RECENTE</span>':'')+
+   
    '<span class="training-menu-check" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 4 4L19 6"/></svg></span></div>';
  }).join('');
 }
