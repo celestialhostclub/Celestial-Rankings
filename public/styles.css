@@ -273,7 +273,7 @@ html{overflow-x:clip}
  -webkit-mask:none;
  mask:none;
  animation:ranking-spin 1.2s linear infinite;
- filter:drop-shadow(0 0 7px rgba(246,92,94,.17));
+ filter:none;
 }
 #ranking-content .ranking-spinner::before,
 #ranking-content .ranking-spinner::after{
@@ -285,20 +285,19 @@ html{overflow-x:clip}
  mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
 }
 #ranking-content .ranking-spinner::before{
- background:#343d49;
+ background:#282d36;
 }
 #ranking-content .ranking-spinner::after{
  background:conic-gradient(
   from -70deg,
-  transparent 0deg,
-  rgba(255,177,92,.08) 54deg,
-  rgba(255,177,92,.65) 113deg,
-  #ffb35b 151deg,
-  #ff9254 196deg,
-  #ff6656 244deg,
-  #f43b70 288deg,
-  rgba(244,59,112,.42) 326deg,
-  transparent 360deg
+  rgba(255,180,82,0) 0deg,
+  rgba(255,180,82,.52) 46deg,
+  #ffb452 85deg,
+  #ff713c 162deg,
+  #ff354e 233deg,
+  #f72465 297deg,
+  rgba(247,36,101,.52) 331deg,
+  rgba(247,36,101,0) 360deg
  );
 }
 #ranking-content .ranking-loading > span:last-child{
