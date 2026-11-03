@@ -105,9 +105,7 @@ async function renderPlayerSearch(){
     const message=period==='all'
      ? 'Esta tag está cadastrada, mas ainda não possui estatísticas de treinos.'
      : 'Esta tag está cadastrada, mas não possui estatísticas no mês selecionado.';
-    result.innerHTML=`<p class="search-message">${message}</p>`+
-     (period==='month'?'<button type="button" id="lookup-all-time">Ver todos os tempos</button>':'');
-    if(period==='month')$('#lookup-all-time').onclick=()=>document.querySelector('[data-period="all"]')?.click();
+    result.innerHTML=`<p class="search-message">${message}</p>`;
    }else if(registered===null){
     result.innerHTML='<p class="search-message">Selecione um mês para consultar as estatísticas.</p>';
    }else{
