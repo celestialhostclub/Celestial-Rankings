@@ -18,7 +18,7 @@ function cancelMotion(){active.forEach(a=>a.cancel());active.clear();}
 preference.addEventListener('change',()=>{if(preference.matches)cancelMotion();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelMotion();});
 export function initMotion(){
-  enter(document.querySelectorAll('.hero .eyebrow,.hero h1,.hero p'),{stagger:65,distance:12,duration:500});
+  enter(document.querySelectorAll('.hero .eyebrow,.hero h1,.hero p,.data-sync-status .sync-pill'),{stagger:62,distance:10,duration:510});
   if (!('IntersectionObserver' in window)) return;
   const observer=new IntersectionObserver(entries=>{
     entries.forEach(entry=>{
@@ -27,5 +27,5 @@ export function initMotion(){
       observer.unobserve(entry.target);
     });
   },{threshold:.08});
-  document.querySelectorAll('#historico,#embreve').forEach(el=>observer.observe(el));
+  document.querySelectorAll('#historico,#embreve,.future-grid .future,.about-placeholder').forEach(el=>observer.observe(el));
 }
