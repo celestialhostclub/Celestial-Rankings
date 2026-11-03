@@ -33,7 +33,7 @@ async function load(){
   if(searchActive)renderPlayerSearch();
  }
 }
-document.querySelectorAll('[data-period]').forEach(b=>b.onclick=()=>{period=b.dataset.period;document.querySelectorAll('[data-period]').forEach(x=>x.setAttribute('aria-pressed',x===b));$('#month').disabled=period==='all'||!sessions.length;load();});$('#month').onchange=load;
+document.querySelectorAll('[data-period]').forEach(b=>b.onclick=()=>{period=b.dataset.period;document.querySelectorAll('[data-period]').forEach(x=>x.setAttribute('aria-pressed',x===b));$('#month').disabled=period==='all'||!sessions.length;refreshRankingMonthMenu();load();});$('#month').onchange=load;
 function monthLabel(value){
  const [year,month]=value.split('-').map(Number);
  return new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(year,month-1,1)));
@@ -47,6 +47,7 @@ function updateMonthOptions(months){
  else if(available.length)select.value=available[0];
  monthsInitialized=true;
  select.disabled=period==='all'||!available.length;
+ refreshRankingMonthMenu();
 }
 function updateTrainingPicker(){
  const select=$('#training'),selected=select.value;
@@ -54,6 +55,83 @@ function updateTrainingPicker(){
  select.disabled=!sessions.length;
  if(sessions.some(session=>String(session.id)===selected))select.value=selected;
  refreshTrainingMenu();
+}
+
+
+/* Ranking months share the same dark visual menu as the training selector.
+   Keep the original <select> as the source of truth for period, search and API. */
+function refreshRankingMonthMenu(){
+ const root=$('#ranking-month-menu'),select=$('#month'),trigger=$('#ranking-month-trigger'),list=$('#ranking-month-list');
+ if(!root?.classList.contains('is-enhanced'))return;
+ const options=[...select.options].filter(option=>option.value);
+ const selected=select.selectedOptions[0];
+ trigger.disabled=select.disabled||period==='all'||!options.length;
+ trigger.querySelector('.training-menu-value').textContent=selected?.value?selected.textContent:'';
+ list.hidden=true;root.classList.remove('is-open');trigger.setAttribute('aria-expanded','false');
+ list.innerHTML=options.map((option,index)=>{
+  const chosen=option.value===select.value;
+  return '<div role="option" class="training-menu-option'+(chosen?' is-selected':'')+
+   '" data-value="'+escape(option.value)+'" aria-selected="'+chosen+'" tabindex="-1">'+
+   '<span class="training-menu-option-icon" aria-hidden="true">'+iconSvg('clock')+'</span>'+
+   '<span class="training-menu-option-title">'+escape(option.textContent)+'</span>'+
+   (index===0?'<span class="training-menu-newest">MAIS RECENTE</span>':'')+
+   '<span class="training-menu-check" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 4 4L19 6"/></svg></span></div>';
+ }).join('');
+}
+function initRankingMonthMenu(){
+ const root=$('#ranking-month-menu'),select=$('#month'),trigger=$('#ranking-month-trigger'),list=$('#ranking-month-list');
+ if(!root||!select||!trigger||!list)return;
+ const items=()=>[...list.querySelectorAll('[role="option"]')];
+ const close=(restoreFocus=false)=>{
+  if(list.hidden)return;
+  list.hidden=true;root.classList.remove('is-open');trigger.setAttribute('aria-expanded','false');
+  if(restoreFocus)trigger.focus({preventScroll:true});
+ };
+ const focusIndex=(index)=>{
+  const options=items();if(!options.length)return;
+  const item=options[Math.max(0,Math.min(index,options.length-1))];
+  item.focus({preventScroll:true});item.scrollIntoView({block:'nearest'});
+ };
+ const open=(direction='selected')=>{
+  if(trigger.disabled)return;
+  list.hidden=false;root.classList.add('is-open');trigger.setAttribute('aria-expanded','true');
+  const options=items(),selectedIndex=options.findIndex(option=>option.dataset.value===select.value);
+  focusIndex(direction==='first'?0:direction==='last'?options.length-1:Math.max(0,selectedIndex));
+ };
+ const choose=(item)=>{
+  if(!item)return;
+  select.value=item.dataset.value;
+  select.dispatchEvent(new Event('change',{bubbles:true}));
+  refreshRankingMonthMenu();
+  trigger.focus({preventScroll:true});
+ };
+ trigger.addEventListener('click',()=>list.hidden?open():close());
+ trigger.addEventListener('keydown',event=>{
+  if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+   event.preventDefault();open(event.key==='ArrowUp'||event.key==='End'?'last':'selected');
+  }else if(event.key==='Escape')close(true);
+ });
+ list.addEventListener('click',event=>{
+  const item=event.target.closest('[role="option"]');
+  if(item&&list.contains(item))choose(item);
+ });
+ list.addEventListener('keydown',event=>{
+  const options=items(),index=options.indexOf(document.activeElement);
+  if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+   event.preventDefault();
+   const target=event.key==='Home'?0:event.key==='End'?options.length-1:
+     event.key==='ArrowUp'?Math.max(0,index-1):Math.min(options.length-1,index+1);
+   focusIndex(target);
+  }else if(event.key==='Enter'||event.key===' '){
+   event.preventDefault();choose(options[index]);
+  }else if(event.key==='Escape'){
+   event.preventDefault();close(true);
+  }else if(event.key==='Tab')close();
+ });
+ document.addEventListener('pointerdown',event=>{if(!root.contains(event.target))close();});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!list.hidden){event.preventDefault();close(true);}});
+ select.tabIndex=-1;select.setAttribute('aria-hidden','true');
+ root.classList.add('is-enhanced');refreshRankingMonthMenu();
 }
 
 function refreshTrainingMenu(){
@@ -143,7 +221,7 @@ function renderMatches(){
   return `<article class="match"><div class="match-meta"><span>Confronto ${String(m.number||i+1).padStart(2,'0')}</span><span class="status">${status}</span></div><div class="score"><button class="team-link ${m.mapsA<m.mapsB?'loser':''}" data-session="${escape(session.id)}" data-team="${escape(teamA.id)}">${escape(teamA.name)}</button><strong><span class="${m.mapsA<m.mapsB?'loser':''}">${m.mapsA}</span><em>×</em><span class="${m.mapsB<m.mapsA?'loser':''}">${m.mapsB}</span></strong><button class="team-link ${m.mapsB<m.mapsA?'loser':''}" data-session="${escape(session.id)}" data-team="${escape(teamB.id)}">${escape(teamB.name)}</button></div><div class="match-foot"><span>${m.mapsA+m.mapsB} mapas disputados</span><span class="${m.extended?'extended':''}">${foot}</span></div><button class="roster-button" data-session="${escape(session.id)}" data-match="${escape(m.id)}" aria-label="Ver detalhes de ${escape(teamA.name)} contra ${escape(teamB.name)}">${iconSvg('users')} Ver times e desempenho</button></article>`
  }).join(''):'<p class="state">Nenhum confronto registrado neste treino.</p>';
 }
-$('#training').onchange=()=>{renderMatches();enter(document.querySelectorAll('.match'),{distance:9,stagger:42,duration:410});};initTrainingMenu();renderMatches();load();$('#contact').onclick=()=>$('#contact-dialog').showModal();$('#close-dialog').onclick=()=>$('#contact-dialog').close();$('#contact-dialog').onclick=e=>{if(e.target===$('#contact-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}};
+$('#training').onchange=()=>{renderMatches();enter(document.querySelectorAll('.match'),{distance:9,stagger:42,duration:410});};initTrainingMenu();initRankingMonthMenu();renderMatches();load();$('#contact').onclick=()=>$('#contact-dialog').showModal();$('#close-dialog').onclick=()=>$('#contact-dialog').close();$('#contact-dialog').onclick=e=>{if(e.target===$('#contact-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}};
 
 document.querySelectorAll("[data-icon]").forEach(el=>el.innerHTML=iconSvg(el.dataset.icon));
 

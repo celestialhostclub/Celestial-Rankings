@@ -581,3 +581,82 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
   border-color:#ffaf86;
  }
 }
+
+
+/* Celestial Host — ranking month selector, same premium dark menu as trainings. */
+#ranking-treinos .filters .ranking-month-menu{
+ position:relative;
+ display:block;
+ flex:0 1 164px;
+ width:164px;
+ min-width:0;
+ max-width:100%;
+ margin:0;
+}
+#ranking-treinos .filters .ranking-month-menu>select{width:100%;min-width:0}
+#ranking-treinos .filters .ranking-month-menu.is-enhanced>select{display:none!important}
+#ranking-treinos .filters .ranking-month-menu .training-menu-trigger{
+ display:none;
+ width:100%;
+ height:44px;
+ min-height:44px;
+ padding:0 11px;
+ border-radius:8px;
+ font-size:12px;
+ border-color:#465668;
+ background:linear-gradient(125deg,#1b2634,#111a24);
+ box-shadow:inset 0 1px 0 #ffffff0a,0 5px 17px #00000024;
+}
+#ranking-treinos .filters .ranking-month-menu.is-enhanced .training-menu-trigger{display:flex}
+#ranking-treinos .filters .ranking-month-menu .training-menu-trigger:disabled{opacity:.48;cursor:default}
+#ranking-treinos .filters .ranking-month-menu .training-menu-trigger .training-menu-value{
+ overflow:hidden;
+ white-space:nowrap;
+ text-overflow:ellipsis;
+ text-transform:none;
+}
+#ranking-treinos .filters .ranking-month-menu .training-menu-list{
+ left:auto;
+ right:0;
+ width:max(100%,228px);
+ max-width:calc(100vw - 32px);
+ max-height:min(310px,48vh);
+ text-transform:none;
+}
+#ranking-treinos>.section-heading{z-index:3}
+#ranking-treinos .ranking-month-menu.is-open{z-index:90}
+#ranking-treinos{overflow:visible}
+#ranking-treinos .ranking-month-menu .training-menu-option-title{text-transform:none}
+#ranking-treinos .ranking-month-menu .training-menu-option{min-height:44px}
+#ranking-treinos .ranking-month-menu .training-menu-newest{font-size:8px}
+@media(max-width:1099px){
+ #ranking-treinos .filters .ranking-month-menu{width:100%;max-width:none;min-width:0;flex:auto}
+ #ranking-treinos .filters .ranking-month-menu .training-menu-trigger{width:100%}
+}
+@media(max-width:380px){
+ #ranking-treinos .ranking-month-menu .training-menu-newest{display:none}
+ #ranking-treinos .filters .ranking-month-menu .training-menu-trigger{padding:0 7px;font-size:11px}
+}
+
+/* Names of both teams: restore Celestial Host orange-to-pink hover. */
+#historico .team-link{
+ transition:border-color .22s ease,color .22s ease,filter .24s ease;
+}
+#historico .team-link:is(:hover,:focus-visible){
+ background:linear-gradient(100deg,#ffb15b 0%,#ff8646 42%,#f43d75 100%);
+ background-clip:text;
+ -webkit-background-clip:text;
+ color:transparent;
+ -webkit-text-fill-color:transparent;
+ border-bottom-color:#ee8f7f;
+ filter:drop-shadow(0 0 7px #fb895647);
+}
+
+/* Match cards gently brighten without changing their base hue or border. */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ #historico .match:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.06);
+  box-shadow:inset 0 1px 0 #ffffff16,0 0 25px #e1e9f21c,0 16px 30px #0000004a;
+ }
+}
