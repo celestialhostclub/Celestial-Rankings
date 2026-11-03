@@ -1,7 +1,7 @@
 import {enter,initMotion} from './motion.js';
 const icons={"chart": "<path d=\"M4 21V12h4v9M10 21V3h4v18M16 21V8h4v13\"/>", "trophy": "<path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 0v6m-5 3h10m-8 0v-3h6v3\"/>", "users": "<circle cx=\"9\" cy=\"7\" r=\"3\"/><path d=\"M3 21v-3a6 6 0 0 1 12 0v3M16 4a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 5v2\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 6v6l4 2\"/>", "map": "<path d=\"m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2V5Zm6-2v16m6-14v16\"/>", "swords": "<path d=\"m3 3 5 1 12 14-2 2L4 8 3 3Zm18 0-5 1-5 6m-3 3-4 5 2 2 4-4M3 21l3-3m12 0 3 3M2 16l6 6m8 0 6-6\"/>", "lock": "<rect x=\"5\" y=\"10\" width=\"14\" height=\"11\" rx=\"2\"/><path d=\"M8 10V7a4 4 0 0 1 8 0v3m-4 5v2\"/>"};
 const iconSvg=(name)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.chart}</svg>`;
-import{getDashboard,getPlayerStats,teamStats,sessions,getTeamPlayers}from'./data.js';
+import{getDashboard,getPlayerStats,teamStats,sessions,getTeamPlayers,getTrophyRanking}from'./data.js';
 const $=s=>document.querySelector(s);let period='month',request=0,allPlayers=[],searchActive=false,rankingState='loading';const date=d=>new Date(d+'T12:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}).replace('.','');const year=d=>String(d).slice(0,4);const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const initials=p=>escape(p.name.slice(0,2).toUpperCase());const rate=p=>`<span class="rate"><span class="bar"><i style="width:${p.rate}%"></i></span><strong>${p.rate}%</strong></span>`;
 const playerPortrait=()=>`<span class="club-avatar" aria-hidden="true"><img src="player-emblem.png" alt="" width="64" height="64" decoding="async"></span>`;
 function renderRanking(players){players=players.slice(0,10);if(!players.length){$('#ranking-content').innerHTML='<div class="state">Ainda não há treinos registrados neste período.<br>O ranking será preenchido quando o bot salvar os primeiros resultados.</div>';return;}$('#ranking-content').innerHTML=`<div class="ranking-wrap"><table><caption class="sr">Ranking de jogadores por confrontos vencidos</caption><thead><tr><th scope="col">Pos.</th><th scope="col">Jogador</th><th scope="col">Tag</th><th scope="col">Treinos<br>jogados</th><th scope="col">Confrontos<br>vencidos</th><th scope="col">Confrontos<br>perdidos</th><th scope="col">Mapas<br>vencidos</th><th scope="col">Mapas<br>perdidos</th><th scope="col">Taxa de<br>vitória</th></tr></thead><tbody>${players.map((p,i)=>`<tr class="rank-${i+1}"><td><span class="rank-number">${String(i+1).padStart(2,'0')}</span></td><td><span class="player">${playerPortrait()}${escape(p.name)}</span></td><td class="tag">${escape(p.tag)}</td><td>${p.trainings}</td><td class="win">${p.wins}</td><td class="loss">${p.losses}</td><td>${p.mapsWon}</td><td class="loss">${p.mapsLost}</td><td>${rate(p)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-ranking">${players.map((p,i)=>`<article class="player-card rank-${i+1}"><div class="player-top"><span class="rank-number">${i+1}</span>${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div>${rate(p)}</div><div class="player-card-stats"><div><small>Treinos jogados</small><strong>${p.trainings}</strong></div><div><small>Confrontos</small><strong>${p.wins} V <span class="loss">/ ${p.losses} D</span></strong></div><div><small>Mapas</small><strong>${p.mapsWon} V <span class="loss">/ ${p.mapsLost} D</span></strong></div></div></article>`).join('')}</div>`;}
@@ -285,10 +285,67 @@ function positionSearch(){
  $('#search-submit').textContent=compactSearch.matches?'Buscar':'Consultar estatísticas';
 }
 compactSearch.addEventListener('change',positionSearch);positionSearch();
+/* Independent trophies leaderboard; train rankings are untouched. */
+let trophyLastLoaded=0,trophyRequest=0;
+const trophyFormatter=new Intl.NumberFormat('pt-BR');
+function trophyEmpty(){
+ return '<div class="trophy-empty"><span class="trophy-empty-icon" aria-hidden="true">'+iconSvg('trophy')+'</span><h3>Ranking em preparação</h3><p>Aguardando a primeira sincronização de troféus do Zeus Bot.</p></div>';
+}
+function trophyUpdated(date){
+ if(!date)return 'Aguardando primeira sincronização';
+ const parsed=new Date(date);
+ return Number.isNaN(parsed.getTime())?'Última sincronização indisponível':'Atualizado em '+new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(parsed);
+}
+function renderTrophyRanking(data){
+ const players=data.players.slice(0,10);
+ $('#trophy-updated').textContent=trophyUpdated(data.updatedAt);
+ if(!players.length){$('#trophy-content').innerHTML=trophyEmpty();return;}
+ const rows=players.map((p,i)=>{
+  const n=i+1;
+  return '<tr class="trophy-position-'+n+'"><td><span class="trophy-rank-number">'+String(n).padStart(2,'0')+'</span></td>'+
+   '<td><div class="trophy-player">'+playerPortrait()+'<span class="trophy-player-name"><strong>'+escape(p.name)+'</strong><small>'+escape(p.tag)+'</small></span></div></td>'+
+   '<td><span class="trophy-division">'+escape(p.division)+'</span></td>'+
+   '<td class="trophy-score">'+trophyFormatter.format(p.trophies)+'</td></tr>';
+ }).join('');
+ const cards=players.map((p,i)=>{
+  const n=i+1;
+  return '<article class="trophy-player-card trophy-position-'+n+'">'+
+   '<div class="trophy-card-header"><span class="trophy-rank-number">'+String(n).padStart(2,'0')+'</span>'+playerPortrait()+
+   '<div class="trophy-player-name"><strong>'+escape(p.name)+'</strong><small>'+escape(p.tag)+'</small></div></div>'+
+   '<div class="trophy-card-bottom"><span class="trophy-division">'+escape(p.division)+'</span>'+
+   '<strong class="trophy-score">'+trophyFormatter.format(p.trophies)+' <small>troféus</small></strong></div></article>';
+ }).join('');
+ $('#trophy-content').innerHTML='<div class="trophy-table-scroll"><table class="trophy-table">'+
+  '<caption class="sr">Top 10 de troféus entre os clubes Celestial Host</caption>'+
+  '<thead><tr><th scope="col">POS.</th><th scope="col">JOGADOR</th><th scope="col">DIVISÃO</th><th scope="col">TROFÉUS</th></tr></thead>'+
+  '<tbody>'+rows+'</tbody></table></div><div class="trophy-mobile-list">'+cards+'</div>';
+}
+async function loadTrophyRanking(force=false){
+ if(!force&&trophyLastLoaded&&Date.now()-trophyLastLoaded<300000)return;
+ const id=++trophyRequest,button=$('#trophy-refresh'),panel=$('#trophy-content');
+ if(!panel)return;
+ panel.setAttribute('aria-busy','true');button.disabled=true;
+ panel.innerHTML='<div class="trophy-loading" role="status"><span class="ranking-spinner" aria-hidden="true"></span><span>CARREGANDO TROFÉUS...</span></div>';
+ try{
+  const data=await getTrophyRanking();
+  if(id!==trophyRequest)return;
+  renderTrophyRanking(data);trophyLastLoaded=Date.now();
+ }catch{
+  if(id!==trophyRequest)return;
+  $('#trophy-updated').textContent='Não foi possível atualizar';
+  panel.innerHTML='<div class="trophy-empty"><span class="trophy-empty-icon" aria-hidden="true">'+iconSvg('trophy')+'</span><h3>Falha ao consultar o ranking</h3><p>Não foi possível carregar os dados. Tente novamente.</p></div>';
+  trophyLastLoaded=0;
+ }finally{
+  if(id===trophyRequest){panel.setAttribute('aria-busy','false');button.disabled=false;}
+ }
+}
+$('#trophy-refresh').addEventListener('click',()=>loadTrophyRanking(true));
+
 function showView(focus=false){
  const hash=location.hash.slice(1);const route=['treinos','rankings','sobre-nos'].includes(hash)?hash:'treinos';
  document.querySelectorAll('.site-view').forEach(view=>{view.hidden=view.id!==(route==='treinos'?'view-treinos':route);});
  $('#conteudo').dataset.view=route;
+ if(route==='rankings')loadTrophyRanking();
  document.querySelectorAll('nav [data-view]').forEach(a=>{const selected=a.dataset.view===route;a.classList.toggle('active',selected);if(selected)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós'}[route]} · Celestial Rankings`;
  if(focus){$('#'+(route==='treinos'?'view-treinos':route)).focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}

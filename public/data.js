@@ -54,3 +54,16 @@ export function getTeamPlayers(sessionId, teamId) {
     ?.teams.find((item) => String(item.id) === String(teamId));
   return team?.players || [];
 }
+
+
+/** Read-only public top ten, proxied through the Vercel backend. */
+export async function getTrophyRanking() {
+  const response = await fetch("/api/trophies", {
+    headers: { accept: "application/json" },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Não foi possível consultar os troféus.");
+  const data = await response.json();
+  if (!Array.isArray(data.players)) throw new Error("Resposta inválida do ranking de troféus.");
+  return data;
+}

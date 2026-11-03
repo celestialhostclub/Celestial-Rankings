@@ -705,3 +705,80 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
   box-shadow:inset 0 1px 0 #ffffff16,0 0 25px #e1e9f21c,0 16px 30px #0000004a;
  }
 }
+
+
+/* Celestial Host — Rankings / Top 10 de Troféus */
+#rankings .page-heading{margin-bottom:30px}
+#trophy-ranking{position:relative;margin-bottom:42px}
+#trophy-ranking .section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:17px}
+#trophy-ranking .section-heading>div{min-width:0}
+#trophy-ranking .section-heading .overline{display:block;margin-bottom:10px;font-size:10px;letter-spacing:2.1px;color:#e49d80}
+#trophy-ranking .section-heading h2{display:flex;align-items:center;gap:12px;font-size:clamp(21px,2vw,27px)}
+#trophy-ranking .section-heading h2 .heading-icon{display:inline-flex;align-items:center;justify-content:center;color:#ffb452}
+#trophy-ranking .section-heading h2 .heading-icon svg{width:25px;height:25px}
+#trophy-ranking .section-heading p{margin-top:8px;font-size:13px;color:#acb6c5}
+.trophy-refresh{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:0 0 auto;min-height:40px;padding:8px 15px;border:1px solid #5d4654;border-radius:8px;background:linear-gradient(122deg,#29202b,#1a1d27);color:#ffdfd2;font-size:12px;font-weight:600;transition:border-color .22s ease,background .22s ease,transform .22s ease}
+.trophy-refresh svg{color:#f5a16f}
+.trophy-refresh:hover:not(:disabled){border-color:#dc826f;background:linear-gradient(120deg,#3a2630,#29202f);transform:translateY(-1px)}
+.trophy-refresh:disabled{opacity:.5;cursor:wait}
+.trophy-panel{position:relative;overflow:hidden;border:1px solid #35404d;border-radius:15px;background:linear-gradient(145deg,#19212b 0%,#11171e 42%,#11151c 100%);box-shadow:0 18px 44px #0000002b,inset 0 1px 0 #ffffff08}
+.trophy-panel:before{content:"";position:absolute;left:-8%;right:-8%;top:0;height:1px;background:linear-gradient(90deg,transparent,#ffae5677 30%,#f52d625e 70%,transparent);pointer-events:none}
+.trophy-panel-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;min-height:56px;padding:15px 22px;border-bottom:1px solid #303a48;background:#101721a1}
+.trophy-panel-caption{color:#ffbd93;font-size:10px;font-weight:800;letter-spacing:1.55px}
+.trophy-panel-caption span{color:#f15970;margin:0 5px}
+.trophy-updated{color:#a2b1c0;font-size:11px;font-weight:500}
+.trophy-table-scroll{width:100%;overflow-x:auto}
+.trophy-table{width:100%;border-collapse:collapse;text-align:left;font-variant-numeric:tabular-nums}
+.trophy-table thead{background:#141c26b3}
+.trophy-table th{padding:15px 22px;border-bottom:1px solid #303b48;color:#879aaf;font-size:10px;font-weight:700;letter-spacing:1.25px;white-space:nowrap}
+.trophy-table th:last-child,.trophy-table td:last-child{text-align:right}
+.trophy-table td{padding:15px 22px;border-bottom:1px solid #ffffff0c;vertical-align:middle}
+.trophy-table tbody tr:last-child td{border-bottom:0}
+.trophy-table tbody tr{transition:background-color .23s ease}
+.trophy-table tbody tr:hover{background:rgba(248,115,89,.065)}
+.trophy-rank-number{display:inline-flex;align-items:center;justify-content:center;min-width:30px;color:#a9b8c7;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.trophy-position-1 .trophy-rank-number{color:#ffce6c;text-shadow:0 0 15px #ffb45233}
+.trophy-position-2 .trophy-rank-number{color:#d5e3ef}
+.trophy-position-3 .trophy-rank-number{color:#e6ad8a}
+.trophy-player{display:flex;align-items:center;gap:13px;min-width:0}
+.trophy-player .club-avatar,.trophy-card-header .club-avatar{flex:0 0 auto}
+.trophy-player-name{display:flex;flex-direction:column;gap:3px;min-width:0}
+.trophy-player-name strong{font-size:13px;line-height:1.4;color:#e8edf5;font-weight:700;overflow-wrap:anywhere}
+.trophy-player-name small{font-size:11px;color:#899aac;font-weight:500}
+.trophy-division{display:inline-block;max-width:220px;padding:6px 11px;border:1px solid #50444e;border-radius:6px;background:linear-gradient(115deg,#302632a3,#23232eb8);color:#f4c1ad;font-size:11px;font-weight:700;overflow-wrap:anywhere}
+.trophy-score{color:#ffbe86;font-size:17px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
+.trophy-empty,.trophy-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:268px;padding:45px 22px;gap:12px;text-align:center}
+.trophy-empty-icon{display:grid;place-items:center;width:64px;height:64px;margin-bottom:3px;border:1px solid #70444d;border-radius:50%;background:radial-gradient(circle at 25% 20%,#5c2e35a6,#211e29 72%);color:#f8a36a;box-shadow:0 0 27px #f64c6331}
+.trophy-empty-icon svg{width:28px;height:28px}
+.trophy-empty h3{font-size:19px;color:#edf1f6}
+.trophy-empty p{max-width:440px;font-size:13px;line-height:1.7;color:#aab6c6}
+.trophy-loading{gap:14px;color:#b9c6d7;font-size:11px;font-weight:700;letter-spacing:1.6px}
+.trophy-loading .ranking-spinner{position:relative;display:block;flex:0 0 36px;width:36px;height:36px;border:0;border-radius:50%;background:conic-gradient(from -70deg,transparent,#ffb452 22%,#ff713c 48%,#ff354e 69%,#f72465 84%,transparent);animation:ranking-spin 1.2s linear infinite;mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px))}
+.trophy-mobile-list{display:none}
+#rankings .ranking-upcoming{margin-top:44px}
+#rankings .ranking-upcoming .future-grid{grid-template-columns:minmax(0,1fr)}
+#rankings .ranking-upcoming .future{min-height:112px}
+@media(max-width:780px){
+ #trophy-ranking .section-heading{align-items:flex-start;flex-wrap:wrap;gap:16px}
+ .trophy-panel-top{padding:15px 17px}
+ .trophy-table-scroll{display:none}
+ .trophy-mobile-list{display:grid;gap:0}
+ .trophy-player-card{padding:16px 17px;border-bottom:1px solid #ffffff0f;transition:background-color .22s ease}
+ .trophy-player-card:last-child{border-bottom:0}
+ .trophy-player-card:hover{background:#e8795520}
+ .trophy-card-header{display:flex;align-items:center;gap:12px}
+ .trophy-card-header .trophy-player-name{flex:1 1 auto}
+ .trophy-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 0 45px}
+ .trophy-card-bottom .trophy-score{font-size:16px}
+ .trophy-score small{color:#8999ac;font-size:10px;font-weight:500}
+}
+@media(max-width:420px){
+ #trophy-ranking .section-heading h2{font-size:21px}
+ .trophy-panel-caption{font-size:9px;letter-spacing:1px}
+ .trophy-updated{font-size:10px}
+ .trophy-card-bottom{margin-left:0;flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){
+ .trophy-refresh,.trophy-table tbody tr,.trophy-player-card{transition:none}
+ .trophy-loading .ranking-spinner{animation:none}
+}
