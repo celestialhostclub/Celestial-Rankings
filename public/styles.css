@@ -553,3 +553,6 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
   flex:1 1 auto;
  }
 }
+
+/* Um único contorno para a busca: o foco fica no campo externo, não no input interno. */
+#player-tag:focus-visible{outline:none}
