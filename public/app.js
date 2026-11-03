@@ -38,12 +38,15 @@ function monthLabel(value){
  const [year,month]=value.split('-').map(Number);
  return new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(year,month-1,1)));
 }
+let monthsInitialized=false;
 function updateMonthOptions(months){
- const select=$('#month'),selected=select.value;
- select.innerHTML=months.length?months.map(value=>`<option value="${value}">${monthLabel(value)}</option>`).join():'<option value="">Nenhum treino registrado</option>';
- if(months.includes(selected))select.value=selected;
- else if(months.length)select.value=months[0];
- select.disabled=period==='all'||!months.length;
+ const select=$('#month'),selected=monthsInitialized?select.value:'';
+ const available=[...new Set(months.filter(month=>/^\d{4}-(0[1-9]|1[0-2])$/.test(month)))].sort().reverse();
+ select.innerHTML=available.length?available.map(value=>`<option value="${value}">${monthLabel(value)}</option>`).join(''):'<option value="">Nenhum treino registrado</option>';
+ if(monthsInitialized&&available.includes(selected))select.value=selected;
+ else if(available.length)select.value=available[0];
+ monthsInitialized=true;
+ select.disabled=period==='all'||!available.length;
 }
 function updateTrainingPicker(){
  const select=$('#training'),selected=select.value;
@@ -95,9 +98,23 @@ async function renderPlayerSearch(){
  if(!/^[A-Z0-9]+$/.test(tag)){result.innerHTML='<p class="search-message">Confira a tag: use apenas letras e números, com ou sem #.</p>';return;}
  result.innerHTML='<p class="search-message">Carregando estatísticas do período…</p>';
  try{
-  const p=await getPlayerStats('#'+tag,{period,month:$('#month').value});
+  const {player:p,registered}=await getPlayerStats('#'+tag,{period,month:$('#month').value});
   if(requestId!==playerSearchRequest)return;
-  if(!p){result.innerHTML='<p class="search-message">Nenhum resultado para essa tag neste período. Confira a tag ou escolha outro período.</p>';return;}
+  if(!p){
+   if(registered===true){
+    const message=period==='all'
+     ? 'Esta tag está cadastrada, mas ainda não possui estatísticas de treinos.'
+     : 'Esta tag está cadastrada, mas não possui estatísticas no mês selecionado.';
+    result.innerHTML=`<p class="search-message">${message}</p>`+
+     (period==='month'?'<button type="button" id="lookup-all-time">Ver todos os tempos</button>':'');
+    if(period==='month')$('#lookup-all-time').onclick=()=>document.querySelector('[data-period="all"]')?.click();
+   }else if(registered===null){
+    result.innerHTML='<p class="search-message">Selecione um mês para consultar as estatísticas.</p>';
+   }else{
+    result.innerHTML='<p class="search-message">Nenhum jogador cadastrado com essa tag.</p>';
+   }
+   return;
+  }
   const index=allPlayers.findIndex(player=>normalizeTag(player.tag)===tag);
   const position=index>=0?(index+1)+'º lugar':'';
   const label=period==='all'?'Todos os tempos':$('#month').selectedOptions[0].textContent;

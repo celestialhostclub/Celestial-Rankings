@@ -29,6 +29,24 @@ async function readPlayer(baseUrl, key, tag, period, monthStart) {
   return response.json();
 }
 
+async function isRegisteredPlayer(baseUrl, key, tag) {
+  const table = "ranking_players";
+  const url = new URL("/rest/v1/" + table, baseUrl);
+  url.searchParams.set("select", "player_tag");
+  url.searchParams.set("player_tag", "eq." + tag);
+  url.searchParams.set("is_active", "eq.true");
+  url.searchParams.set("limit", "1");
+  const headers = { apikey: key, accept: "application/json" };
+  if (!key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + key;
+  const response = await fetch(url, { headers });
+  if (!response.ok) {
+    const detail = (await response.text()).slice(0, 180).replace(/[\r\n]+/g, " ");
+    throw new Error("SUPABASE_READ_" + table + "_" + response.status + ": " + detail);
+  }
+  const rows = await response.json();
+  return rows.length > 0;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
@@ -52,7 +70,7 @@ export default async function handler(req, res) {
   const monthStart = monthMatch ? requestedMonth + "-01" : "";
   if (period === "month" && !monthStart) {
     res.setHeader("Cache-Control", "private, no-store");
-    return res.status(200).json({ player: null });
+    return res.status(200).json({ player: null, registered: null });
   }
 
   try {
@@ -70,7 +88,8 @@ export default async function handler(req, res) {
       rate: Math.round(rawRate <= 1 ? rawRate * 100 : rawRate),
     } : null;
     res.setHeader("Cache-Control", "private, no-store");
-    return res.status(200).json({ player });
+    const registered = player ? true : await isRegisteredPlayer(baseUrl, key, tag);
+    return res.status(200).json({ player, registered });
   } catch (error) {
     console.error("Celestial player API failed:", error instanceof Error ? error.message : "unknown error");
     return res.status(502).json({ error: "Não foi possível consultar as estatísticas agora." });

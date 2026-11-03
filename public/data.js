@@ -45,7 +45,7 @@ export async function getPlayerStats(tag, { period = "month", month = "" } = {})
   if (!Object.prototype.hasOwnProperty.call(data, "player")) {
     throw new Error("A resposta da busca está incompleta.");
   }
-  return data.player;
+  return data;
 }
 
 export function getTeamPlayers(sessionId, teamId) {
