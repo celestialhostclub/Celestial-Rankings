@@ -259,8 +259,59 @@ html{overflow-x:clip}
 .demo .demo-note{font-size:12px;letter-spacing:0;padding:0;border:0;border-radius:0;color:var(--muted)}
 
 
-/* Match the spinner arc to the Celestial Rankings wordmark gradient. */
-#ranking-content .ranking-spinner{border:0;background:conic-gradient(from 0deg,#f7ad50 0%,#f56437 22%,#f52c58 48%,#3a404a 49%,#3a404a 100%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px))}
+/* Celestial Rankings — aro contínuo inspirado no degradê da identidade visual.
+   Base escura e arco colorido no mesmo anel; sem divisões abruptas. */
+#ranking-content .ranking-spinner{
+ position:relative;
+ display:block;
+ flex:0 0 36px;
+ width:36px;
+ height:36px;
+ border:0;
+ border-radius:50%;
+ background:none;
+ -webkit-mask:none;
+ mask:none;
+ animation:ranking-spin 1.2s linear infinite;
+ filter:drop-shadow(0 0 7px rgba(246,92,94,.17));
+}
+#ranking-content .ranking-spinner::before,
+#ranking-content .ranking-spinner::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ border-radius:50%;
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
+ mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
+}
+#ranking-content .ranking-spinner::before{
+ background:#343d49;
+}
+#ranking-content .ranking-spinner::after{
+ background:conic-gradient(
+  from -70deg,
+  transparent 0deg,
+  rgba(255,177,92,.08) 54deg,
+  rgba(255,177,92,.65) 113deg,
+  #ffb35b 151deg,
+  #ff9254 196deg,
+  #ff6656 244deg,
+  #f43b70 288deg,
+  rgba(244,59,112,.42) 326deg,
+  transparent 360deg
+ );
+}
+#ranking-content .ranking-loading > span:last-child{
+ animation:ranking-loading-breathe 1.9s ease-in-out infinite;
+}
+@keyframes ranking-loading-breathe{
+ 0%,100%{opacity:.74}
+ 50%{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+ #ranking-content .ranking-spinner,
+ #ranking-content .ranking-loading > span:last-child{animation:none}
+}
 
 
 /* Celestial Rankings — status informativo compacto junto ao resumo. */
