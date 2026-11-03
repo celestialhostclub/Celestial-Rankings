@@ -453,3 +453,7 @@ footer>div:last-child .footer-credit{margin-bottom:3px}
 @media(max-width:700px){.training-picker .training-menu{flex:1 1 auto;width:100%;max-width:none;margin-left:0}.training-picker .training-menu-trigger{min-height:46px;padding:10px 13px}.training-menu-list{max-height:min(340px,58vh)}}
 @media(max-width:380px){.training-menu-newest{display:none}.training-menu-option-title{font-size:11px}.footer-credit{font-size:12px!important}}
 @media(prefers-reduced-motion:reduce){.training-menu-list{animation:none}.training-menu-option,.training-menu-trigger{transition:none!important;transform:none!important}}
+
+/* Allow the custom training menu to extend beyond the historical card. */
+#historico{overflow:visible}
+#historico .training-menu.is-open{z-index:90}
