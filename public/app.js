@@ -4,6 +4,26 @@ const iconSvg=(name)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 import{getDashboard,getPlayerStats,teamStats,sessions,getTeamPlayers,getTrophyRanking}from'./data.js';
 const $=s=>document.querySelector(s);let period='month',request=0,allPlayers=[],searchActive=false,rankingState='loading';const date=d=>new Date(d+'T12:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}).replace('.','');const year=d=>String(d).slice(0,4);const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const initials=p=>escape(p.name.slice(0,2).toUpperCase());const rate=p=>`<span class="rate"><span class="bar"><i style="width:${p.rate}%"></i></span><strong>${p.rate}%</strong></span>`;
 const playerPortrait=()=>`<span class="club-avatar" aria-hidden="true"><img src="player-emblem.png" alt="" width="64" height="64" decoding="async"></span>`;
+
+// A season changes at midnight in Sao Paulo, regardless of visitor timezone.
+const brazilSeasonYear=()=>Number(new Intl.DateTimeFormat("en-US",{timeZone:"America/Sao_Paulo",year:"numeric"}).format(new Date()));
+let activeSeasonYear=brazilSeasonYear();
+function updateSeasonLabels(){
+ const heading=$("#season-year"),footer=$("#copyright-year");
+ if(heading)heading.textContent="/ "+activeSeasonYear;
+ if(footer)footer.textContent="© "+activeSeasonYear+" Celestial Host";
+}
+function refreshSeason(){
+ const next=brazilSeasonYear();
+ if(next===activeSeasonYear)return;
+ activeSeasonYear=next;
+ monthsInitialized=false;
+ updateSeasonLabels();
+ load();
+}
+updateSeasonLabels();
+setInterval(refreshSeason,30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshSeason();});
 function renderRanking(players){players=players.slice(0,10);if(!players.length){$('#ranking-content').innerHTML='<div class="state">Ainda não há treinos registrados neste período.<br>O ranking será preenchido quando o bot salvar os primeiros resultados.</div>';return;}$('#ranking-content').innerHTML=`<div class="ranking-wrap"><table><caption class="sr">Ranking de jogadores por confrontos vencidos</caption><thead><tr><th scope="col">Pos.</th><th scope="col">Jogador</th><th scope="col">Tag</th><th scope="col">Treinos<br>jogados</th><th scope="col">Confrontos<br>vencidos</th><th scope="col">Confrontos<br>perdidos</th><th scope="col">Mapas<br>vencidos</th><th scope="col">Mapas<br>perdidos</th><th scope="col">Taxa de<br>vitória</th></tr></thead><tbody>${players.map((p,i)=>`<tr class="rank-${i+1}"><td><span class="rank-number">${String(i+1).padStart(2,'0')}</span></td><td><span class="player">${playerPortrait()}${escape(p.name)}</span></td><td class="tag">${escape(p.tag)}</td><td>${p.trainings}</td><td class="win">${p.wins}</td><td class="loss">${p.losses}</td><td>${p.mapsWon}</td><td class="loss">${p.mapsLost}</td><td>${rate(p)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-ranking">${players.map((p,i)=>`<article class="player-card rank-${i+1}"><div class="player-top"><span class="rank-number">${i+1}</span>${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div>${rate(p)}</div><div class="player-card-stats"><div><small>Treinos jogados</small><strong>${p.trainings}</strong></div><div><small>Confrontos</small><strong>${p.wins} V <span class="loss">/ ${p.losses} D</span></strong></div><div><small>Mapas</small><strong>${p.mapsWon} V <span class="loss">/ ${p.mapsLost} D</span></strong></div></div></article>`).join('')}</div>`;}
 async function load(){
  const id=++request;
@@ -255,7 +275,7 @@ async function renderPlayerSearch(){
   if(!p){
    if(registered===true){
     const message=period==='all'
-     ? 'Esta tag está cadastrada, mas ainda não possui estatísticas de treinos.'
+     ? 'Esta tag está cadastrada, mas ainda não possui estatísticas nesta temporada.'
      : 'Esta tag está cadastrada, mas não possui estatísticas no mês selecionado.';
     result.innerHTML=`<p class="search-message">${message}</p>`;
    }else if(registered===null){
@@ -267,7 +287,7 @@ async function renderPlayerSearch(){
   }
   const index=allPlayers.findIndex(player=>normalizeTag(player.tag)===tag);
   const position=index>=0?(index+1)+'º lugar':'';
-  const label=period==='all'?'Todos os tempos':$('#month').selectedOptions[0].textContent;
+  const label=period==='all'?`Temporada ${activeSeasonYear}`:$('#month').selectedOptions[0].textContent;
   result.innerHTML=`<article class="lookup-result"><div class="lookup-player">${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div><span class="lookup-position">${position}</span></div><p class="lookup-period">${escape(label)}</p><dl class="lookup-stats">${[['Treinos jogados',p.trainings],['Confrontos vencidos',p.wins],['Confrontos perdidos',p.losses],['Mapas vencidos',p.mapsWon],['Mapas perdidos',p.mapsLost],['Taxa de vitória',p.rate+'%']].map(([name,value])=>`<div><dt>${name}</dt><dd>${value}</dd></div>`).join('')}</dl></article>`;
  }catch{
   if(requestId!==playerSearchRequest)return;

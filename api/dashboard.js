@@ -1,5 +1,11 @@
 const rankingFields = "player_tag,player_name,trainings_played,match_wins,match_losses,maps_won,maps_lost,match_win_rate";
 
+function currentSeasonYear() {
+  return Number(new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Sao_Paulo", year: "numeric",
+  }).format(new Date()));
+}
+
 function formatPlayerName(value) {
   return String(value || "Jogador").replace(/\s*\|\s*/g, " | ");
 }
@@ -98,15 +104,17 @@ export default async function handler(req, res) {
   }
 
   try {
+    const seasonYear = currentSeasonYear();
     const period = req.query?.period === "all" ? "all" : "month";
     const requestedMonth = String(req.query?.month || "");
     const monthMatch = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(requestedMonth);
-    const month = monthMatch ? requestedMonth : "";
+    const month = monthMatch && Number(monthMatch[1]) === seasonYear ? requestedMonth : "";
     const monthStart = month ? month + "-01" : "";
 
     const rankingRequest = period === "all"
-      ? readRows(baseUrl, key, "active_training_player_ranking", {
+      ? readRows(baseUrl, key, "active_training_player_season_ranking", {
           select: rankingFields,
+          season_year: "eq." + seasonYear,
           order: "match_wins.desc,maps_won.desc,maps_lost.asc,player_name.asc",
           limit: "5000",
         })
@@ -119,7 +127,7 @@ export default async function handler(req, res) {
           })
         : Promise.resolve([]);
 
-    const [rankingRows, rawSessions] = await Promise.all([
+    const [rankingRows, allFinishedSessions] = await Promise.all([
       rankingRequest,
       readRows(baseUrl, key, "training_sessions", {
         select: "id,status,opened_at,generated_at,finished_at,created_at",
@@ -129,6 +137,11 @@ export default async function handler(req, res) {
       }),
     ]);
 
+    // Use the same finished-at/Brasilia boundary as the Supabase monthly ranking.
+    // The annual cleanup is independent; previous seasons never appear even if it is delayed.
+    const rawSessions = allFinishedSessions.filter((session) =>
+      session.finished_at && readableDate(session.finished_at).startsWith(String(seasonYear))
+    );
     const sessionIds = rawSessions.map((session) => session.id);
     let teams = [];
     let matchRows = [];
@@ -235,7 +248,7 @@ export default async function handler(req, res) {
     }
 
     const sessions = rawSessions.map((session) => {
-      const date = readableDate(session.opened_at);
+      const date = readableDate(session.finished_at || session.opened_at);
       return {
         id: session.id,
         name: "Treino",
@@ -265,6 +278,7 @@ export default async function handler(req, res) {
 
     res.setHeader("Cache-Control", "public, s-maxage=15, stale-while-revalidate=30");
     return res.status(200).json({
+      seasonYear,
       players: sortPlayers(rankingRows, period),
       summary: {
         trainings: filteredSessions.length,
