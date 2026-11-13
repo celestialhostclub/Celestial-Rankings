@@ -247,6 +247,9 @@ export default async function handler(req, res) {
       teamsBySession.set(team.session_id, list);
     }
 
+    // A session can be marked "finished" even when an organizer abandoned it
+    // before recording a single map. Such sessions are not played trainings.
+    // Filtering here also removes them from summaries, month options, and history.
     const sessions = rawSessions.map((session) => {
       const date = readableDate(session.finished_at || session.opened_at);
       return {
@@ -258,7 +261,9 @@ export default async function handler(req, res) {
         teams: teamsBySession.get(session.id) || [],
         matches: matchesBySession.get(session.id) || [],
       };
-    });
+    }).filter((session) =>
+      session.matches.some((match) => match.maps.length > 0)
+    );
 
     const filteredSessions = sessions.filter((session) =>
       period === "all" || (month && session.date.startsWith(month))
