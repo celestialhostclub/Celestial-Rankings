@@ -260,7 +260,7 @@ html{overflow-x:clip}
 
 
 /* Celestial Rankings — aro contínuo inspirado no degradê da identidade visual.
-   Base escura e arco colorido no mesmo anel; trecho cinza maior e transições curtas. */
+   Base escura e arco colorido no mesmo anel; trecho cinza amplo e transições suaves de opacidade. */
 #ranking-content .ranking-spinner{
  position:relative;
  display:block;
@@ -290,12 +290,19 @@ html{overflow-x:clip}
 #ranking-content .ranking-spinner::after{
  background:conic-gradient(
   from -70deg,
-  transparent 0deg 50deg,
-  #ffb452 58deg,
-  #ff713c 126deg,
-  #ff354e 198deg,
-  #f72465 266deg,
-  transparent 274deg 360deg
+  rgba(255,180,82,0) 0deg 50deg,
+  rgba(255,180,82,.12) 63deg,
+  rgba(255,180,82,.42) 75deg,
+  rgba(255,180,82,.78) 85deg,
+  #ffb452 95deg,
+  #ff9147 125deg,
+  #ff713c 153deg,
+  #ff354e 204deg,
+  #f72465 235deg,
+  rgba(247,36,101,.78) 246deg,
+  rgba(247,36,101,.42) 257deg,
+  rgba(247,36,101,.12) 268deg,
+  rgba(247,36,101,0) 274deg 360deg
  );
 }
 #ranking-content .ranking-loading > span:last-child{
