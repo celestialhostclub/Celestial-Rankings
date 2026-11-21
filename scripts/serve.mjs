@@ -8,7 +8,8 @@ const port=Number(process.env.PORT||3000);
 createServer(async(req,res)=>{
  try{
   const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
-  let target=resolve(root,'.'+path);
+  const pageRoutes = new Set(['/treinos', '/rankings', '/sobre-nos', '/area-de-membros']);
+  let target=resolve(root,'.'+(pageRoutes.has(path) ? '/index.html' : path));
   if(target!==resolve(root)&&!target.startsWith(resolve(root)+sep)){res.writeHead(403).end();return;}
   if((await stat(target)).isDirectory())target=resolve(target,'index.html');
   const bytes=await readFile(target);res.writeHead(200,{'Content-Type':types[extname(target)]||'application/octet-stream'});res.end(req.method==='HEAD'?undefined:bytes);

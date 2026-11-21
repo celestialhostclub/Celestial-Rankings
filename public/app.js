@@ -373,7 +373,7 @@ async function loadTrophyRanking(force=false){
 }
 $('#trophy-refresh').addEventListener('click',()=>loadTrophyRanking(true));
 
-const siteRoutes=new Set(["treinos","rankings","sobre-nos"]);
+const siteRoutes=new Set(["treinos","rankings","sobre-nos","area-de-membros"]);
 function currentSiteRoute(){
  const hash=decodeURIComponent(location.hash.slice(1));
  if(siteRoutes.has(hash)){
@@ -389,7 +389,7 @@ function showView(focus=false){
  $('#conteudo').dataset.view=route;
  if(route==='rankings')loadTrophyRanking();
  document.querySelectorAll('nav [data-view]').forEach(a=>{const selected=a.dataset.view===route;a.classList.toggle('active',selected);if(selected)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
- document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós'}[route]} · Celestial Rankings`;
+ document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós','area-de-membros':'Área de Membros'}[route]} · Celestial Rankings`;
  if(focus){$('#'+(route==='treinos'?'view-treinos':route)).focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 }
 document.querySelectorAll('nav [data-view],a.brand').forEach(link=>{
@@ -405,3 +405,37 @@ document.querySelectorAll('nav [data-view],a.brand').forEach(link=>{
 window.addEventListener('popstate',()=>showView(true));
 window.addEventListener('hashchange',()=>{if(siteRoutes.has(location.hash.slice(1)))showView(true);});
 showView();
+
+const demoTrophies = [
+  48200, 48320, 48280, 48610, 49030, 49110, 48990, 49310, 49730, 49800,
+  50010, 50170, 49940, 50090, 50370, 50820, 50720, 51000, 51340, 51170,
+  51510, 51620, 51770, 51890, 52110, 52080, 52360, 52640, 52500, 52820,
+];
+const demoButtons = [...document.querySelectorAll('[data-demo-days]')];
+const formatDemoNumber = new Intl.NumberFormat('pt-BR');
+const formatDemoChange = new Intl.NumberFormat('pt-BR', { signDisplay: 'exceptZero' });
+
+function renderTrophyDemo(days) {
+  const totals = demoTrophies.slice(-(days === 1 ? 2 : days));
+  const first = totals[0];
+  const last = totals.at(-1);
+  const minimum = Math.min(...totals);
+  const range = Math.max(...totals) - minimum || 1;
+  const points = totals.map((total, index) => [
+    12 + 576 * index / (totals.length - 1),
+    160 - 140 * (total - minimum) / range,
+  ]);
+  $('#demo-total').textContent = formatDemoNumber.format(last);
+  $('#demo-change').textContent = formatDemoChange.format(last - first) + ' troféus no período';
+  $('#demo-start').textContent = (days === 1 ? 'Ontem' : 'Início do período') + ' · ' + formatDemoNumber.format(first);
+  $('#demo-finish').textContent = 'Hoje · ' + formatDemoNumber.format(last);
+  $('#demo-chart').setAttribute('aria-label', 'Evolução demonstrativa de ' + formatDemoNumber.format(first) + ' para ' + formatDemoNumber.format(last) + ' troféus');
+  $('#demo-line').setAttribute('points', points.map(point => point.join(',')).join(' '));
+  const [x, y] = points.at(-1);
+  $('#demo-end').setAttribute('cx', x);
+  $('#demo-end').setAttribute('cy', y);
+  demoButtons.forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.demoDays) === days)));
+}
+
+demoButtons.forEach(button => button.addEventListener('click', () => renderTrophyDemo(Number(button.dataset.demoDays))));
+renderTrophyDemo(7);

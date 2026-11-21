@@ -795,3 +795,16 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
  .trophy-refresh,.trophy-table tbody tr,.trophy-player-card{transition:none}
  .trophy-loading .ranking-spinner{animation:none}
 }
+
+/* Área de Membros */
+.members-demo,.members-invite{max-width:880px;margin:0 auto 24px;padding:clamp(16px,4vw,34px);border:1px solid var(--border);border-radius:16px;background:var(--surface)}
+.members-demo h2,.members-invite h2{margin:8px 0}
+.members-demo-toolbar,.members-demo-labels{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.members-demo-toolbar p,.members-invite p{margin:8px 0;color:var(--muted)}
+#demo-change{color:#ffbe86;font-weight:700}
+#demo-chart{display:block;width:100%;max-height:260px}
+.members-chart-grid{fill:none;stroke:var(--border)}
+#demo-line{fill:none;stroke:#ff826c;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+#demo-end{fill:#ffbe86}
+.members-demo-labels{color:var(--muted);font-size:.8rem}
+@media(max-width:760px){.header-inner nav{column-gap:clamp(8px,3vw,20px);flex-wrap:wrap;justify-content:center}}

@@ -22,6 +22,10 @@
     {
       "source": "/sobre-nos",
       "destination": "/index.html"
+    },
+    {
+      "source": "/area-de-membros",
+      "destination": "/index.html"
     }
   ]
 }
