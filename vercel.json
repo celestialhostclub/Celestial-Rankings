@@ -9,5 +9,19 @@
       "path": "/api/keepalive",
       "schedule": "0 8 * * *"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/treinos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/rankings",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/sobre-nos",
+      "destination": "/index.html"
+    }
   ]
 }

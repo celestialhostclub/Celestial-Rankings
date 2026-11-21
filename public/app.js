@@ -3,7 +3,7 @@ const icons={"chart": "<path d=\"M4 21V12h4v9M10 21V3h4v18M16 21V8h4v13\"/>", "t
 const iconSvg=(name)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.chart}</svg>`;
 import{getDashboard,getPlayerStats,teamStats,sessions,getTeamPlayers,getTrophyRanking}from'./data.js';
 const $=s=>document.querySelector(s);let period='month',request=0,allPlayers=[],searchActive=false,rankingState='loading';const date=d=>new Date(d+'T12:00:00Z').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}).replace('.','');const year=d=>String(d).slice(0,4);const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const initials=p=>escape(p.name.slice(0,2).toUpperCase());const rate=p=>`<span class="rate"><span class="bar"><i style="width:${p.rate}%"></i></span><strong>${p.rate}%</strong></span>`;
-const playerPortrait=()=>`<span class="club-avatar" aria-hidden="true"><img src="player-emblem.png" alt="" width="64" height="64" decoding="async"></span>`;
+const playerPortrait=()=>`<span class="club-avatar" aria-hidden="true"><img src="/player-emblem.png" alt="" width="64" height="64" decoding="async"></span>`;
 
 // A season changes at midnight in Sao Paulo, regardless of visitor timezone.
 const brazilSeasonYear=()=>Number(new Intl.DateTimeFormat("en-US",{timeZone:"America/Sao_Paulo",year:"numeric"}).format(new Date()));
@@ -316,22 +316,18 @@ function trophyUpdated(date){
  const parsed=new Date(date);
  return Number.isNaN(parsed.getTime())?'Última sincronização indisponível':'Atualizado em '+new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(parsed);
 }
-// Presentation-only labels: keep raw MySQL/Supabase values unchanged.
-const trophyDivisionLabels = {
- ONEIRICS: ["ONEIRIC'S","🌙"],
- CELESTIALS: ["CELESTIAL'S","☀️"],
- DIVINES: ["DIVINE'S","🪽"],
- SACREDS: ["SACRED'S","🏛️"],
- OLYMPUS: ["OLYMPU'S","⚡"],
+// Names and emojis now come from the MySQL divisions table via Supabase.
+const cleanTrophyText=(value)=>String(value??"")
+ .replace(/[\uFFFD\uE000-\uF8FF]/g,"")
+ .replace(/[\u0000-\u001F\u007F]/g,"")
+ .trim();
+const formatTrophyPlayerName=(name)=>cleanTrophyText(name).replace(/\s*\|\s*/g," | ");
+const formatTrophyDivision=(player)=>{
+ const label=cleanTrophyText(player.divisionName || player.division || "") || "—";
+ const emoji=cleanTrophyText(player.divisionEmoji || "");
+ return escape(label)+(emoji?' <span class="trophy-division-emoji" aria-hidden="true">'+escape(emoji)+'</span>':"");
 };
-const formatTrophyPlayerName=(name)=>String(name||"").trim().replace(/\s*\|\s*/g," | ");
-const formatTrophyDivision=(division)=>{
- const raw=String(division||"").trim();
- const key=raw.toUpperCase().replace(/[^A-Z]/g,"");
- const details=trophyDivisionLabels[key];
- if(!details)return escape(raw||"—");
- return escape(details[0])+' <span class="trophy-division-emoji" aria-hidden="true">'+details[1]+'</span>';
-};
+
 function renderTrophyRanking(data){
  const players=data.players.slice(0,10);
  $('#trophy-updated').textContent=trophyUpdated(data.updatedAt);
@@ -340,16 +336,15 @@ function renderTrophyRanking(data){
   const n=i+1;
   return '<tr class="trophy-position-'+n+'"><td><span class="trophy-rank-number">'+String(n).padStart(2,'0')+'</span></td>'+
    '<td><div class="trophy-player">'+playerPortrait()+'<span class="trophy-player-name"><strong>'+escape(formatTrophyPlayerName(p.name))+'</strong><small>'+escape(p.tag)+'</small></span></div></td>'+
-   '<td><span class="trophy-division">'+formatTrophyDivision(p.division)+'</span></td>'+
+   '<td><span class="trophy-division">'+formatTrophyDivision(p)+'</span></td>'+
    '<td class="trophy-score">'+trophyFormatter.format(p.trophies)+'</td></tr>';
  }).join('');
  const cards=players.map((p,i)=>{
   const n=i+1;
   return '<article class="trophy-player-card trophy-position-'+n+'">'+
    '<div class="trophy-card-header"><span class="trophy-rank-number">'+String(n).padStart(2,'0')+'</span>'+playerPortrait()+
-   '<div class="trophy-player-name"><strong>'+escape(formatTrophyPlayerName(p.name))+'</strong><small>'+escape(p.tag)+'</small></div>'+ 
-   '<span class="trophy-division">'+formatTrophyDivision(p.division)+'</span></div>'+
-   '<div class="trophy-card-bottom">'+
+   '<div class="trophy-player-name"><strong>'+escape(formatTrophyPlayerName(p.name))+'</strong><small>'+escape(p.tag)+'</small></div></div>'+
+   '<div class="trophy-card-side"><span class="trophy-division">'+formatTrophyDivision(p)+'</span>'+
    '<strong class="trophy-score">'+trophyFormatter.format(p.trophies)+' <small>troféus</small></strong></div></article>';
  }).join('');
  $('#trophy-content').innerHTML='<div class="trophy-table-scroll"><table class="trophy-table">'+
@@ -378,8 +373,18 @@ async function loadTrophyRanking(force=false){
 }
 $('#trophy-refresh').addEventListener('click',()=>loadTrophyRanking(true));
 
+const siteRoutes=new Set(["treinos","rankings","sobre-nos"]);
+function currentSiteRoute(){
+ const hash=decodeURIComponent(location.hash.slice(1));
+ if(siteRoutes.has(hash)){
+  history.replaceState(null,"",'/'+hash+location.search);
+  return hash;
+ }
+ const path=location.pathname.split("/").filter(Boolean).join("/");
+ return siteRoutes.has(path)?path:"treinos";
+}
 function showView(focus=false){
- const hash=location.hash.slice(1);const route=['treinos','rankings','sobre-nos'].includes(hash)?hash:'treinos';
+ const route=currentSiteRoute();
  document.querySelectorAll('.site-view').forEach(view=>{view.hidden=view.id!==(route==='treinos'?'view-treinos':route);});
  $('#conteudo').dataset.view=route;
  if(route==='rankings')loadTrophyRanking();
@@ -387,4 +392,16 @@ function showView(focus=false){
  document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós'}[route]} · Celestial Rankings`;
  if(focus){$('#'+(route==='treinos'?'view-treinos':route)).focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 }
-window.addEventListener('hashchange',()=>showView(true));showView();
+document.querySelectorAll('nav [data-view],a.brand').forEach(link=>{
+ link.addEventListener('click',(event)=>{
+  if(event.button!==0||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;
+  const route=link.dataset.view||"treinos";
+  if(!siteRoutes.has(route))return;
+  event.preventDefault();
+  if(location.pathname!=='/'+route||location.hash)history.pushState(null,"",'/'+route);
+  showView(true);
+ });
+});
+window.addEventListener('popstate',()=>showView(true));
+window.addEventListener('hashchange',()=>{if(siteRoutes.has(location.hash.slice(1)))showView(true);});
+showView();

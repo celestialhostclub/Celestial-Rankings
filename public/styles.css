@@ -770,25 +770,26 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
  .trophy-panel-top{padding:15px 17px}
  .trophy-table-scroll{display:none}
  .trophy-mobile-list{display:grid;gap:0}
- .trophy-player-card{padding:16px 17px;border-bottom:1px solid #ffffff0f;transition:background-color .22s ease}
+ .trophy-player-card{display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:10px;padding:16px 17px;border-bottom:1px solid #ffffff0f;transition:background-color .22s ease}
  .trophy-player-card:last-child{border-bottom:0}
  .trophy-player-card:hover{background:#e8795520}
- .trophy-card-header{display:grid;grid-template-columns:30px 40px minmax(0,1fr) auto;align-items:center;gap:10px}
- .trophy-card-header .trophy-player-name{min-width:0}
- .trophy-card-header .trophy-division{justify-self:end;max-width:none;padding:5px 8px;font-size:10px}
- .trophy-card-bottom{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:12px 0 0}
- .trophy-card-bottom .trophy-score{font-size:16px}
+ .trophy-card-header{display:grid;grid-template-columns:28px 40px minmax(0,1fr);align-items:center;gap:10px;min-width:0;height:100%}
+ .trophy-card-header .trophy-player-name{min-width:0;align-self:center}
+ .trophy-card-side{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:10px;min-width:0}
+ .trophy-card-side .trophy-division{max-width:none;padding:5px 8px;font-size:10px}
+ .trophy-card-side .trophy-score{font-size:16px}
  .trophy-score small{color:#8999ac;font-size:10px;font-weight:500}
 }
 @media(max-width:420px){
  #trophy-ranking .section-heading h2{font-size:21px}
  .trophy-panel-caption{font-size:9px;letter-spacing:1px}
  .trophy-updated{font-size:10px}
- .trophy-card-header{grid-template-columns:30px 34px minmax(0,1fr) auto;gap:7px}
+ .trophy-card-header{grid-template-columns:26px 34px minmax(0,1fr);gap:7px}
  .trophy-card-header .club-avatar{width:34px;height:34px;min-width:34px;min-height:34px;flex-basis:34px}
- .trophy-card-header .trophy-division{padding:4px 6px;font-size:9px;gap:2px}
- .trophy-card-header .trophy-division-emoji{font-size:11px}
- .trophy-card-bottom{margin-left:0;flex-wrap:wrap}
+ .trophy-card-side{gap:8px}
+ .trophy-card-side .trophy-division{padding:4px 6px;font-size:9px;gap:2px}
+ .trophy-card-side .trophy-division-emoji{font-size:11px}
+ .trophy-card-header .trophy-player-name strong{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){
  .trophy-refresh,.trophy-table tbody tr,.trophy-player-card{transition:none}
