@@ -389,7 +389,7 @@ function showView(focus=false){
  $('#conteudo').dataset.view=route;
  if(route==='rankings')loadTrophyRanking();
  document.querySelectorAll('nav [data-view]').forEach(a=>{const selected=a.dataset.view===route;a.classList.toggle('active',selected);if(selected)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
- document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós','area-de-membros':'Área de Membros'}[route]} · Celestial Rankings`;
+ document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós','area-de-membros':'Área Membro'}[route]} · Celestial Rankings`;
  if(focus){$('#'+(route==='treinos'?'view-treinos':route)).focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 }
 document.querySelectorAll('nav [data-view],a.brand').forEach(link=>{
