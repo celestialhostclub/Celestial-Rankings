@@ -316,6 +316,22 @@ function trophyUpdated(date){
  const parsed=new Date(date);
  return Number.isNaN(parsed.getTime())?'Última sincronização indisponível':'Atualizado em '+new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(parsed);
 }
+// Presentation-only labels: keep raw MySQL/Supabase values unchanged.
+const trophyDivisionLabels = {
+ ONEIRICS: ["ONEIRIC'S","🌙"],
+ CELESTIALS: ["CELESTIAL'S","☀️"],
+ DIVINES: ["DIVINE'S","🪽"],
+ SACREDS: ["SACRED'S","🏛️"],
+ OLYMPUS: ["OLYMPU'S","⚡"],
+};
+const formatTrophyPlayerName=(name)=>String(name||"").trim().replace(/\\s*\\|\\s*/g," | ");
+const formatTrophyDivision=(division)=>{
+ const raw=String(division||"").trim();
+ const key=raw.toUpperCase().replace(/[^A-Z]/g,"");
+ const details=trophyDivisionLabels[key];
+ if(!details)return escape(raw||"—");
+ return escape(details[0])+' <span class="trophy-division-emoji" aria-hidden="true">'+details[1]+'</span>';
+};
 function renderTrophyRanking(data){
  const players=data.players.slice(0,10);
  $('#trophy-updated').textContent=trophyUpdated(data.updatedAt);
@@ -323,16 +339,17 @@ function renderTrophyRanking(data){
  const rows=players.map((p,i)=>{
   const n=i+1;
   return '<tr class="trophy-position-'+n+'"><td><span class="trophy-rank-number">'+String(n).padStart(2,'0')+'</span></td>'+
-   '<td><div class="trophy-player">'+playerPortrait()+'<span class="trophy-player-name"><strong>'+escape(p.name)+'</strong><small>'+escape(p.tag)+'</small></span></div></td>'+
-   '<td><span class="trophy-division">'+escape(p.division)+'</span></td>'+
+   '<td><div class="trophy-player">'+playerPortrait()+'<span class="trophy-player-name"><strong>'+escape(formatTrophyPlayerName(p.name))+'</strong><small>'+escape(p.tag)+'</small></span></div></td>'+
+   '<td><span class="trophy-division">'+formatTrophyDivision(p.division)+'</span></td>'+
    '<td class="trophy-score">'+trophyFormatter.format(p.trophies)+'</td></tr>';
  }).join('');
  const cards=players.map((p,i)=>{
   const n=i+1;
   return '<article class="trophy-player-card trophy-position-'+n+'">'+
    '<div class="trophy-card-header"><span class="trophy-rank-number">'+String(n).padStart(2,'0')+'</span>'+playerPortrait()+
-   '<div class="trophy-player-name"><strong>'+escape(p.name)+'</strong><small>'+escape(p.tag)+'</small></div></div>'+
-   '<div class="trophy-card-bottom"><span class="trophy-division">'+escape(p.division)+'</span>'+
+   '<div class="trophy-player-name"><strong>'+escape(formatTrophyPlayerName(p.name))+'</strong><small>'+escape(p.tag)+'</small></div>'+ 
+   '<span class="trophy-division">'+formatTrophyDivision(p.division)+'</span></div>'+
+   '<div class="trophy-card-bottom">'+
    '<strong class="trophy-score">'+trophyFormatter.format(p.trophies)+' <small>troféus</small></strong></div></article>';
  }).join('');
  $('#trophy-content').innerHTML='<div class="trophy-table-scroll"><table class="trophy-table">'+
