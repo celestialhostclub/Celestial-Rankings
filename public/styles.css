@@ -751,7 +751,8 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 .trophy-player-name{display:flex;flex-direction:column;gap:3px;min-width:0}
 .trophy-player-name strong{font-size:13px;line-height:1.4;color:#e8edf5;font-weight:700;overflow-wrap:anywhere}
 .trophy-player-name small{font-size:11px;color:#899aac;font-weight:500}
-.trophy-division{display:inline-block;max-width:220px;padding:6px 11px;border:1px solid #50444e;border-radius:6px;background:linear-gradient(115deg,#302632a3,#23232eb8);color:#f4c1ad;font-size:11px;font-weight:700;overflow-wrap:anywhere}
+.trophy-division{display:inline-flex;align-items:center;gap:4px;max-width:220px;padding:6px 11px;border:1px solid #50444e;border-radius:6px;background:linear-gradient(115deg,#302632a3,#23232eb8);color:#f4c1ad;font-size:11px;font-weight:700;white-space:nowrap}
+.trophy-division-emoji{display:inline-block;flex:0 0 auto;font-size:13px;line-height:1}
 .trophy-score{color:#ffbe86;font-size:17px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
 .trophy-empty,.trophy-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:268px;padding:45px 22px;gap:12px;text-align:center}
 .trophy-empty-icon{display:grid;place-items:center;width:64px;height:64px;margin-bottom:3px;border:1px solid #70444d;border-radius:50%;background:radial-gradient(circle at 25% 20%,#5c2e35a6,#211e29 72%);color:#f8a36a;box-shadow:0 0 27px #f64c6331}
@@ -772,9 +773,10 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
  .trophy-player-card{padding:16px 17px;border-bottom:1px solid #ffffff0f;transition:background-color .22s ease}
  .trophy-player-card:last-child{border-bottom:0}
  .trophy-player-card:hover{background:#e8795520}
- .trophy-card-header{display:flex;align-items:center;gap:12px}
- .trophy-card-header .trophy-player-name{flex:1 1 auto}
- .trophy-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 0 45px}
+ .trophy-card-header{display:grid;grid-template-columns:30px 40px minmax(0,1fr) auto;align-items:center;gap:10px}
+ .trophy-card-header .trophy-player-name{min-width:0}
+ .trophy-card-header .trophy-division{justify-self:end;max-width:none;padding:5px 8px;font-size:10px}
+ .trophy-card-bottom{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:12px 0 0}
  .trophy-card-bottom .trophy-score{font-size:16px}
  .trophy-score small{color:#8999ac;font-size:10px;font-weight:500}
 }
@@ -782,6 +784,10 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
  #trophy-ranking .section-heading h2{font-size:21px}
  .trophy-panel-caption{font-size:9px;letter-spacing:1px}
  .trophy-updated{font-size:10px}
+ .trophy-card-header{grid-template-columns:30px 34px minmax(0,1fr) auto;gap:7px}
+ .trophy-card-header .club-avatar{width:34px;height:34px;min-width:34px;min-height:34px;flex-basis:34px}
+ .trophy-card-header .trophy-division{padding:4px 6px;font-size:9px;gap:2px}
+ .trophy-card-header .trophy-division-emoji{font-size:11px}
  .trophy-card-bottom{margin-left:0;flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){
