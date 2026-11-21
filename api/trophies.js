@@ -19,11 +19,25 @@ export default async function handler(req, res) {
     url.searchParams.set("limit", "10");
     const headers = { apikey: key, accept: "application/json" };
     if (!key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + key;
-    const response = await fetch(url, { headers, cache: "no-store" });
+    const metaUrl = new URL("/rest/v1/trophy_divisions", baseUrl);
+    metaUrl.searchParams.set("select", "slug,name,emoji,club_tag");
+    const [response, metaResponse] = await Promise.all([
+      fetch(url, { headers, cache: "no-store" }),
+      fetch(metaUrl, { headers, cache: "no-store" }),
+    ]);
     if (!response.ok) throw new Error("Trophy source unavailable");
     const rows = await response.json();
     if (!Array.isArray(rows)) throw new Error("Invalid response");
+    // Falha eventual no catálogo não deve impedir o ranking de troféus.
+    const metadata = metaResponse.ok ? await metaResponse.json().catch(() => []) : [];
+    const divisions = Array.isArray(metadata) ? metadata : [];
+    const bySlug = new Map(divisions.map((d) => [String(d.slug || "").toUpperCase(), d]));
+    const byClub = new Map(divisions.map((d) => [String(d.club_tag || "").toUpperCase(), d]));
     const players = rows.slice(0, 10).map((row) => ({
+      divisionName: String((bySlug.get(String(row.division || "").toUpperCase()) ||
+        byClub.get(String(row.club_tag || "").toUpperCase()))?.name || row.division || ""),
+      divisionEmoji: String((bySlug.get(String(row.division || "").toUpperCase()) ||
+        byClub.get(String(row.club_tag || "").toUpperCase()))?.emoji || ""),
       name: String(row.player_name || ""),
       tag: String(row.player_tag || ""),
       division: String(row.division || ""),
