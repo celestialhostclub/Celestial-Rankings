@@ -832,3 +832,6 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 #demo-end { fill: #fff0d7; stroke: #ff557b; stroke-width: 2; }
 .members-demo-labels { margin-top: 10px; }
 .members-invite { border-left: 3px solid #ff826c; }
+
+.members-title-icon{vertical-align:middle;margin-inline-start:.12em}
+.members-title-icon svg{width:.82em;height:.82em}
