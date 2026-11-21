@@ -380,7 +380,7 @@ function currentSiteRoute(){
   history.replaceState(null,"",'/'+hash+location.search);
   return hash;
  }
- const path=location.pathname.replace(/^\\/+|\\/+$/g,"");
+ const path=location.pathname.split("/").filter(Boolean).join("/");
  return siteRoutes.has(path)?path:"treinos";
 }
 function showView(focus=false){
