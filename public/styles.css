@@ -746,7 +746,8 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 .trophy-position-2 .trophy-rank-number{color:#d5e3ef}
 .trophy-position-3 .trophy-rank-number{color:#e6ad8a}
 .trophy-player{display:flex;align-items:center;gap:13px;min-width:0}
-.trophy-player .club-avatar,.trophy-card-header .club-avatar{flex:0 0 auto}
+.trophy-player .club-avatar,.trophy-card-header .club-avatar{display:grid;place-items:center;width:40px;height:40px;min-width:40px;min-height:40px;flex:0 0 40px;overflow:hidden}
+.trophy-player .club-avatar img,.trophy-card-header .club-avatar img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain}
 .trophy-player-name{display:flex;flex-direction:column;gap:3px;min-width:0}
 .trophy-player-name strong{font-size:13px;line-height:1.4;color:#e8edf5;font-weight:700;overflow-wrap:anywhere}
 .trophy-player-name small{font-size:11px;color:#899aac;font-weight:500}
