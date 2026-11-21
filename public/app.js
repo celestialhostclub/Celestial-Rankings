@@ -324,7 +324,7 @@ const trophyDivisionLabels = {
  SACREDS: ["SACRED'S","🏛️"],
  OLYMPUS: ["OLYMPU'S","⚡"],
 };
-const formatTrophyPlayerName=(name)=>String(name||"").trim().replace(/\\s*\\|\\s*/g," | ");
+const formatTrophyPlayerName=(name)=>String(name||"").trim().replace(/\s*\|\s*/g," | ");
 const formatTrophyDivision=(division)=>{
  const raw=String(division||"").trim();
  const key=raw.toUpperCase().replace(/[^A-Z]/g,"");
