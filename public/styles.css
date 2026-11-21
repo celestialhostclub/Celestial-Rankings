@@ -808,3 +808,27 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 #demo-end{fill:#ffbe86}
 .members-demo-labels{color:var(--muted);font-size:.8rem}
 @media(max-width:760px){.header-inner nav{column-gap:clamp(8px,3vw,20px);flex-wrap:wrap;justify-content:center}}
+
+.members-demo {
+  border-color: #644049;
+  background: radial-gradient(ellipse at 90% 0%, #f44d6924, transparent 50%),
+    radial-gradient(ellipse at 0% 10%, #ffaa5c15, transparent 48%), var(--surface);
+  box-shadow: 0 18px 56px #0005, inset 0 1px 0 #ffbc991c;
+}
+.members-demo h2 { font-size: clamp(24px, 4vw, 36px); }
+#demo-total { color: var(--text); font-size: 1.28em; font-variant-numeric: tabular-nums; }
+#demo-change {
+  display: inline-block;
+  margin: 8px 0 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ffab6318;
+  font-variant-numeric: tabular-nums;
+}
+#demo-chart { border: 1px solid #ffffff13; border-radius: 12px; background: #0d0f1280; }
+.members-chart-grid { stroke: #ffffff18; stroke-dasharray: 4 6; }
+#demo-area { fill: url(#demo-fill); }
+#demo-line { stroke: url(#demo-stroke); vector-effect: non-scaling-stroke; }
+#demo-end { fill: #fff0d7; stroke: #ff557b; stroke-width: 2; }
+.members-demo-labels { margin-top: 10px; }
+.members-invite { border-left: 3px solid #ff826c; }

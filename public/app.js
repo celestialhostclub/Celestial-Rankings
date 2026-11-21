@@ -388,6 +388,7 @@ function showView(focus=false){
  document.querySelectorAll('.site-view').forEach(view=>{view.hidden=view.id!==(route==='treinos'?'view-treinos':route);});
  $('#conteudo').dataset.view=route;
  if(route==='rankings')loadTrophyRanking();
+ if(route==='area-de-membros')animateTrophyDemo();
  document.querySelectorAll('nav [data-view]').forEach(a=>{const selected=a.dataset.view===route;a.classList.toggle('active',selected);if(selected)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  document.title=`${{treinos:'Treinos',rankings:'Rankings','sobre-nos':'Sobre Nós','area-de-membros':'Área Membro'}[route]} · Celestial Rankings`;
  if(focus){$('#'+(route==='treinos'?'view-treinos':route)).focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
@@ -404,8 +405,6 @@ document.querySelectorAll('nav [data-view],a.brand').forEach(link=>{
 });
 window.addEventListener('popstate',()=>showView(true));
 window.addEventListener('hashchange',()=>{if(siteRoutes.has(location.hash.slice(1)))showView(true);});
-showView();
-
 const demoTrophies = [
   48200, 48320, 48280, 48610, 49030, 49110, 48990, 49310, 49730, 49800,
   50010, 50170, 49940, 50090, 50370, 50820, 50720, 51000, 51340, 51170,
@@ -430,12 +429,29 @@ function renderTrophyDemo(days) {
   $('#demo-start').textContent = (days === 1 ? 'Ontem' : 'Início do período') + ' · ' + formatDemoNumber.format(first);
   $('#demo-finish').textContent = 'Hoje · ' + formatDemoNumber.format(last);
   $('#demo-chart').setAttribute('aria-label', 'Evolução demonstrativa de ' + formatDemoNumber.format(first) + ' para ' + formatDemoNumber.format(last) + ' troféus');
-  $('#demo-line').setAttribute('points', points.map(point => point.join(',')).join(' '));
+  const line = points.map(point => point.join(',')).join(' ');
+  $('#demo-line').setAttribute('points', line);
+  $('#demo-area').setAttribute('points', '12,160 ' + line + ' 588,160');
   const [x, y] = points.at(-1);
   $('#demo-end').setAttribute('cx', x);
   $('#demo-end').setAttribute('cy', y);
   demoButtons.forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.demoDays) === days)));
 }
 
-demoButtons.forEach(button => button.addEventListener('click', () => renderTrophyDemo(Number(button.dataset.demoDays))));
+function animateTrophyDemo() {
+  const series = $('#demo-series');
+  series.getAnimations().forEach(animation => animation.cancel());
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  series.animate(
+    [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0)' }],
+    { duration: 700, easing: 'cubic-bezier(.22,.7,.25,1)' },
+  );
+}
+
+demoButtons.forEach(button => button.addEventListener('click', () => {
+  if (button.getAttribute('aria-pressed') === 'true') return;
+  renderTrophyDemo(Number(button.dataset.demoDays));
+  animateTrophyDemo();
+}));
 renderTrophyDemo(7);
+showView();

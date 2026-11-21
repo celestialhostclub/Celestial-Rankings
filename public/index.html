@@ -45,8 +45,15 @@
     <p id="demo-change" role="status"></p>
     <svg id="demo-chart" viewBox="0 0 600 180" role="img" aria-label="Gráfico demonstrativo de troféus">
       <path d="M12 20H588 M12 90H588 M12 160H588" class="members-chart-grid"/>
-      <polyline id="demo-line"/>
-      <circle id="demo-end" r="5"/>
+      <defs>
+        <linearGradient id="demo-stroke"><stop stop-color="#ffb45d"/><stop offset="1" stop-color="#ff557b"/></linearGradient>
+        <linearGradient id="demo-fill" x2="0%" y2="100%"><stop stop-color="#ff756f" stop-opacity=".34"/><stop offset="1" stop-color="#ff756f" stop-opacity=".02"/></linearGradient>
+      </defs>
+      <g id="demo-series">
+        <polygon id="demo-area"/>
+        <polyline id="demo-line"/>
+        <circle id="demo-end" r="5"/>
+      </g>
     </svg>
     <div class="members-demo-labels"><span id="demo-start"></span><span id="demo-finish"></span></div>
   </section>
