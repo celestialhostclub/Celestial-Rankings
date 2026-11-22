@@ -25,11 +25,15 @@ updateSeasonLabels();
 setInterval(refreshSeason,30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshSeason();});
 function renderRanking(players){players=players.slice(0,10);if(!players.length){$('#ranking-content').innerHTML='<div class="state">Ainda não há treinos registrados neste período.<br>O ranking será preenchido quando o bot salvar os primeiros resultados.</div>';return;}$('#ranking-content').innerHTML=`<div class="ranking-wrap"><table><caption class="sr">Ranking de jogadores por confrontos vencidos</caption><thead><tr><th scope="col">Pos.</th><th scope="col">Jogador</th><th scope="col">Tag</th><th scope="col">Treinos<br>jogados</th><th scope="col">Confrontos<br>vencidos</th><th scope="col">Confrontos<br>perdidos</th><th scope="col">Mapas<br>vencidos</th><th scope="col">Mapas<br>perdidos</th><th scope="col">Taxa de<br>vitória</th></tr></thead><tbody>${players.map((p,i)=>`<tr class="rank-${i+1}"><td><span class="rank-number">${String(i+1).padStart(2,'0')}</span></td><td><span class="player">${playerPortrait()}${escape(p.name)}</span></td><td class="tag">${escape(p.tag)}</td><td>${p.trainings}</td><td class="win">${p.wins}</td><td class="loss">${p.losses}</td><td>${p.mapsWon}</td><td class="loss">${p.mapsLost}</td><td>${rate(p)}</td></tr>`).join('')}</tbody></table></div><div class="mobile-ranking">${players.map((p,i)=>`<article class="player-card rank-${i+1}"><div class="player-top"><span class="rank-number">${i+1}</span>${playerPortrait()}<div><strong>${escape(p.name)}</strong><span class="tag">${escape(p.tag)}</span></div>${rate(p)}</div><div class="player-card-stats"><div><small>Treinos jogados</small><strong>${p.trainings}</strong></div><div><small>Confrontos</small><strong>${p.wins} V <span class="loss">/ ${p.losses} D</span></strong></div><div><small>Mapas</small><strong>${p.mapsWon} V <span class="loss">/ ${p.mapsLost} D</span></strong></div></div></article>`).join('')}</div>`;}
+function loadingIndicator(label) {
+ return '<div class="site-loading" role="status"><span class="ranking-spinner" aria-hidden="true"></span><span>'+label+'</span></div>';
+}
+
 async function load(){
  const id=++request;
  const requestedMonth=$('#month').value;
  $('#ranking-content').setAttribute('aria-busy','true');
- $('#ranking-content').innerHTML='<div class="ranking-loading" role="status"><span class="ranking-spinner" aria-hidden="true"></span><span>CARREGANDO TREINOS...</span></div>';
+ $('#ranking-content').innerHTML=loadingIndicator('CARREGANDO TREINOS...');
  allPlayers=[];rankingState='loading';$('#search-submit').disabled=true;
  if(searchActive)renderPlayerSearch();
  try{
@@ -268,7 +272,7 @@ async function renderPlayerSearch(){
  const result=$('#player-search-result'),tag=normalizeTag($('#player-tag').value),requestId=++playerSearchRequest;
  if(!tag){result.innerHTML='<p class="search-message">Digite sua tag para consultar.</p>';return;}
  if(!/^[A-Z0-9]+$/.test(tag)){result.innerHTML='<p class="search-message">Confira a tag: use apenas letras e números, com ou sem #.</p>';return;}
- result.innerHTML='<p class="search-message">Carregando estatísticas do período…</p>';
+ result.innerHTML=loadingIndicator('Carregando estatísticas do período…');
  try{
   const {player:p,registered}=await getPlayerStats('#'+tag,{period,month:$('#month').value});
   if(requestId!==playerSearchRequest)return;
@@ -357,7 +361,7 @@ async function loadTrophyRanking(force=false){
  const id=++trophyRequest,button=$('#trophy-refresh'),panel=$('#trophy-content');
  if(!panel)return;
  panel.setAttribute('aria-busy','true');button.disabled=true;
- panel.innerHTML='<div class="trophy-loading" role="status"><span class="ranking-spinner" aria-hidden="true"></span><span>CARREGANDO TROFÉUS...</span></div>';
+ panel.innerHTML=loadingIndicator('CARREGANDO TROFÉUS...');
  try{
   const data=await getTrophyRanking();
   if(id!==trophyRequest)return;

@@ -248,74 +248,12 @@ main[data-view]:not([data-view="treinos"]) .arena-background{display:none}
 html{overflow-x:clip}
 
 /* Center the loading indicator in the ranking area while data is being fetched. */
-#ranking-content .ranking-loading{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:1.4px;text-align:center}
-#ranking-content .ranking-spinner{width:32px;height:32px;border:3px solid #3a404a;border-top-color:#e64c67;border-right-color:#f18b51;border-radius:50%;animation:ranking-spin .8s linear infinite}
 @keyframes ranking-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){#ranking-content .ranking-spinner{animation-duration:2s}}
 
 
 /* Keep the permanent status pill and its supporting note on one flexible line. */
 .demo{flex-wrap:wrap}
 .demo .demo-note{font-size:12px;letter-spacing:0;padding:0;border:0;border-radius:0;color:var(--muted)}
-
-
-/* Celestial Rankings — aro contínuo inspirado no degradê da identidade visual.
-   Base escura e arco colorido no mesmo anel; trecho cinza amplo e transições suaves de opacidade. */
-#ranking-content .ranking-spinner{
- position:relative;
- display:block;
- flex:0 0 36px;
- width:36px;
- height:36px;
- border:0;
- border-radius:50%;
- background:none;
- -webkit-mask:none;
- mask:none;
- animation:ranking-spin 1.2s linear infinite;
- filter:none;
-}
-#ranking-content .ranking-spinner::before,
-#ranking-content .ranking-spinner::after{
- content:"";
- position:absolute;
- inset:0;
- border-radius:50%;
- -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
- mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
-}
-#ranking-content .ranking-spinner::before{
- background:#282d36;
-}
-#ranking-content .ranking-spinner::after{
- background:conic-gradient(
-  from -70deg,
-  rgba(255,180,82,0) 0deg 50deg,
-  rgba(255,180,82,.12) 63deg,
-  rgba(255,180,82,.42) 75deg,
-  rgba(255,180,82,.78) 85deg,
-  #ffb452 95deg,
-  #ff9147 125deg,
-  #ff713c 153deg,
-  #ff354e 204deg,
-  #f72465 235deg,
-  rgba(247,36,101,.78) 246deg,
-  rgba(247,36,101,.42) 257deg,
-  rgba(247,36,101,.12) 268deg,
-  rgba(247,36,101,0) 274deg 360deg
- );
-}
-#ranking-content .ranking-loading > span:last-child{
- animation:ranking-loading-breathe 1.9s ease-in-out infinite;
-}
-@keyframes ranking-loading-breathe{
- 0%,100%{opacity:.74}
- 50%{opacity:1}
-}
-@media(prefers-reduced-motion:reduce){
- #ranking-content .ranking-spinner,
- #ranking-content .ranking-loading > span:last-child{animation:none}
-}
 
 
 /* Celestial Rankings — status informativo compacto junto ao resumo. */
@@ -754,13 +692,13 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 .trophy-division{display:inline-flex;align-items:center;gap:4px;max-width:220px;padding:6px 11px;border:1px solid #50444e;border-radius:6px;background:linear-gradient(115deg,#302632a3,#23232eb8);color:#f4c1ad;font-size:11px;font-weight:700;text-transform:uppercase;white-space:nowrap}
 .trophy-division-emoji{display:inline-block;flex:0 0 auto;font-size:13px;line-height:1}
 .trophy-score{color:#ffbe86;font-size:17px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
-.trophy-empty,.trophy-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:268px;padding:45px 22px;gap:12px;text-align:center}
+.trophy-empty,.site-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:268px;padding:45px 22px;gap:12px;text-align:center}
 .trophy-empty-icon{display:grid;place-items:center;width:64px;height:64px;margin-bottom:3px;border:1px solid #70444d;border-radius:50%;background:radial-gradient(circle at 25% 20%,#5c2e35a6,#211e29 72%);color:#f8a36a;box-shadow:0 0 27px #f64c6331}
 .trophy-empty-icon svg{width:28px;height:28px}
 .trophy-empty h3{font-size:19px;color:#edf1f6}
 .trophy-empty p{max-width:440px;font-size:13px;line-height:1.7;color:#aab6c6}
-.trophy-loading{gap:14px;color:#b9c6d7;font-size:11px;font-weight:700;letter-spacing:1.6px}
-.trophy-loading .ranking-spinner{position:relative;display:block;flex:0 0 36px;width:36px;height:36px;border:0;border-radius:50%;background:conic-gradient(from -70deg,transparent,#ffb452 22%,#ff713c 48%,#ff354e 69%,#f72465 84%,transparent);animation:ranking-spin 1.2s linear infinite;mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px))}
+.site-loading{gap:14px;color:#b9c6d7;font-size:11px;font-weight:700;letter-spacing:1.6px}
+.site-loading .ranking-spinner{position:relative;display:block;flex:0 0 36px;width:36px;height:36px;border:0;border-radius:50%;background:conic-gradient(from -70deg,transparent,#ffb452 22%,#ff713c 48%,#ff354e 69%,#f72465 84%,transparent);animation:ranking-spin 1.2s linear infinite;mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px))}
 .trophy-mobile-list{display:none}
 #rankings .ranking-upcoming{margin-top:44px}
 #rankings .ranking-upcoming .future-grid{grid-template-columns:minmax(0,1fr)}
@@ -793,7 +731,7 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 }
 @media(prefers-reduced-motion:reduce){
  .trophy-refresh,.trophy-table tbody tr,.trophy-player-card{transition:none}
- .trophy-loading .ranking-spinner{animation:none}
+ .site-loading .ranking-spinner{animation:none}
 }
 
 /* Área de Membros */
@@ -835,3 +773,5 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 
 .members-title-icon{vertical-align:middle;margin-inline-start:.12em}
 .members-title-icon svg{width:.82em;height:.82em}
+
+#player-search-result .site-loading{min-height:0;padding:12px;flex-direction:row;letter-spacing:normal}
