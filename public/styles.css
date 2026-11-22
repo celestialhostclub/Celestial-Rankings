@@ -698,7 +698,65 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 .trophy-empty h3{font-size:19px;color:#edf1f6}
 .trophy-empty p{max-width:440px;font-size:13px;line-height:1.7;color:#aab6c6}
 .site-loading{gap:14px;color:#b9c6d7;font-size:11px;font-weight:700;letter-spacing:1.6px}
-.site-loading .ranking-spinner{position:relative;display:block;flex:0 0 36px;width:36px;height:36px;border:0;border-radius:50%;background:conic-gradient(from -70deg,transparent,#ffb452 22%,#ff713c 48%,#ff354e 69%,#f72465 84%,transparent);animation:ranking-spin 1.2s linear infinite;mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px))}
+/* Celestial Rankings — aro contínuo inspirado no degradê da identidade visual.
+   Base escura e arco colorido no mesmo anel; trecho cinza amplo e transições suaves de opacidade. */
+.site-loading .ranking-spinner{
+ position:relative;
+ display:block;
+ flex:0 0 36px;
+ width:36px;
+ height:36px;
+ border:0;
+ border-radius:50%;
+ background:none;
+ -webkit-mask:none;
+ mask:none;
+ animation:ranking-spin 1.2s linear infinite;
+ filter:none;
+}
+.site-loading .ranking-spinner::before,
+.site-loading .ranking-spinner::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ border-radius:50%;
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
+ mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 2.7px));
+}
+.site-loading .ranking-spinner::before{
+ background:#282d36;
+}
+.site-loading .ranking-spinner::after{
+ background:conic-gradient(
+  from -70deg,
+  rgba(255,180,82,0) 0deg 50deg,
+  rgba(255,180,82,.12) 63deg,
+  rgba(255,180,82,.42) 75deg,
+  rgba(255,180,82,.78) 85deg,
+  #ffb452 95deg,
+  #ff9147 125deg,
+  #ff713c 153deg,
+  #ff354e 204deg,
+  #f72465 235deg,
+  rgba(247,36,101,.78) 246deg,
+  rgba(247,36,101,.42) 257deg,
+  rgba(247,36,101,.12) 268deg,
+  rgba(247,36,101,0) 274deg 360deg
+ );
+}
+.site-loading > span:last-child{
+ animation:ranking-loading-breathe 1.9s ease-in-out infinite;
+}
+@keyframes ranking-loading-breathe{
+ 0%,100%{opacity:.74}
+ 50%{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+ .site-loading .ranking-spinner,
+ .site-loading > span:last-child{animation:none}
+}
+
+
 .trophy-mobile-list{display:none}
 #rankings .ranking-upcoming{margin-top:44px}
 #rankings .ranking-upcoming .future-grid{grid-template-columns:minmax(0,1fr)}
@@ -731,7 +789,6 @@ footer .bot-status{font-weight:400;letter-spacing:normal}
 }
 @media(prefers-reduced-motion:reduce){
  .trophy-refresh,.trophy-table tbody tr,.trophy-player-card{transition:none}
- .site-loading .ranking-spinner{animation:none}
 }
 
 /* Área de Membros */
