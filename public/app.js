@@ -328,7 +328,7 @@ const cleanTrophyText=(value)=>String(value??"")
 const formatTrophyPlayerName=(name)=>cleanTrophyText(name).replace(/\s*\|\s*/g," | ");
 document.addEventListener('error',event=>{
  const image=event.target;
- if(!(image instanceof HTMLImageElement)||!image.classList.contains('division-emoji-twemoji'))return;
+ if(!(image instanceof HTMLImageElement)||!image.classList.contains('division-emoji-windows'))return;
  image.hidden=true;
  image.nextElementSibling.hidden=false;
 },true);
@@ -338,9 +338,9 @@ const formatTrophyDivision=(player)=>{
  const emoji=cleanTrophyText(player.divisionEmoji || "");
  if(!emoji)return escape(label);
  const code=[...emoji.replace(/\uFE0F/g,'')].map(symbol=>symbol.codePointAt(0).toString(16)).join('-');
- const url='https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/'+code+'.svg';
+ const url='/division-emoji/'+code+'.png';
  return escape(label)+' <span class="trophy-division-emoji" aria-hidden="true">'+
-  '<img class="division-emoji-twemoji" src="'+url+'" alt="" width="14" height="14" referrerpolicy="no-referrer">'+
+  '<img class="division-emoji-windows" src="'+url+'" alt="" width="14" height="14" referrerpolicy="no-referrer">'+
   '<span hidden>'+escape(emoji)+'</span></span>';
 };
 
