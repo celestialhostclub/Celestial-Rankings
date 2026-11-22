@@ -79,3 +79,7 @@ Confere os hashes de todos os arquivos em relação à exportação original. De
 Foram verificados os hashes de todos os arquivos originais, a sintaxe dos módulos e a integridade do ZIP. Não foi realizada uma nova revisão visual em navegador nem uma implantação de teste na Vercel.
 
 Documentação de configuração: https://vercel.com/docs/project-configuration/vercel-json
+
+## Créditos
+
+Emojis das divisões: [Twemoji](https://github.com/jdecked/twemoji), Twitter, Inc. e colaboradores, sob a licença [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
