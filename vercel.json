@@ -27,5 +27,18 @@
       "source": "/area-de-membros",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/:path((?!api/keepalive$).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "celestial-rankings.vercel.app"
+        }
+      ],
+      "destination": "https://celestialhost.org/:path",
+      "permanent": true
+    }
   ]
 }
